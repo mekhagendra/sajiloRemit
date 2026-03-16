@@ -5,7 +5,7 @@ import { Plus, Pencil, Trash2, X, Check, Eye, EyeOff, Images } from 'lucide-reac
 import RichTextEditor from '../../components/common/RichTextEditor';
 import GalleryPicker from '../../components/common/GalleryPicker';
 
-const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5003/api').replace(/\/api$/, '');
+const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5000/api').replace(/\/api$/, '');
 const resolveUrl = (url: string) => (url?.startsWith('/') ? `${API_BASE}${url}` : url);
 
 const EMPTY_FORM = {

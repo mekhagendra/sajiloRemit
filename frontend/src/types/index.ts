@@ -2,25 +2,25 @@ export interface User {
   _id: string;
   name: string;
   email: string;
-  role: 'user' | 'vendor' | 'admin';
+  role: 'user' | 'remitter' | 'editor' | 'admin';
   status: 'active' | 'suspended';
-  favoriteVendors: string[];
+  favoriteRemitters: string[];
   createdAt: string;
 }
 
-export interface VendorCountry {
+export interface RemitterCountry {
   countryCode: string;
   canSend: boolean;
   canReceive: boolean;
   isActive: boolean;
 }
 
-export interface Vendor {
+export interface Remitter {
   _id: string;
   userId: User | string;
   companyName: string;
   baseCountry: string;
-  supportedCountries: VendorCountry[];
+  supportedCountries: RemitterCountry[];
   email: string;
   phone: string;
   website: string;
@@ -39,7 +39,7 @@ export interface RemittanceRate {
   fee: number;
   receivedAmount?: number;
   isFeatured?: boolean;
-  vendor: {
+  remitter: {
     _id: string;
     companyName: string;
     logo: string;
@@ -54,7 +54,7 @@ export interface BestRate {
   toCurrency: string;
   rate: number;
   unit: number;
-  vendor: {
+  remitter: {
     companyName: string;
     logo: string;
   };
@@ -92,7 +92,7 @@ export interface Blog {
 export interface Review {
   _id: string;
   userId: { _id: string; name: string };
-  vendorId: { _id: string; companyName: string; logo?: string };
+  remitterId: { _id: string; companyName: string; logo?: string };
   rating: number;
   text: string;
   isApproved: boolean;
@@ -110,7 +110,7 @@ export interface Banner {
 
 export interface Statistics {
   countries: number;
-  vendors: number;
+  remitters: number;
   banks: number;
   users: number;
 }
@@ -149,7 +149,7 @@ export interface Partner {
   description?: string;
   isActive: boolean;
   featured: boolean;
-  vendorId?: string;
+  remitterId?: string;
 }
 
 export interface PartnerRoute {
@@ -171,7 +171,7 @@ export interface ExchangeChartCell {
 
 export interface ExchangeChartData {
   countries: Country[];
-  vendors: { _id: string; companyName: string; logo: string }[];
+  remitters: { _id: string; companyName: string; logo: string }[];
   matrix: Record<string, Record<string, ExchangeChartCell>>;
 }
 
@@ -184,7 +184,7 @@ export interface SnapshotListItem {
 export interface SnapshotData {
   date: string;
   countries: Country[];
-  vendors: { _id: string; companyName: string; logo: string }[];
+  remitters: { _id: string; companyName: string; logo: string }[];
   matrix: Record<string, Record<string, ExchangeChartCell>>;
 }
 

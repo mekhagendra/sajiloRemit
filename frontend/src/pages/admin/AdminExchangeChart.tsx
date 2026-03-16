@@ -9,7 +9,7 @@ import {
 import type { Country, ExchangeChartCell, SnapshotListItem } from '../../types';
 import { BarChart3, Camera, History, Save, X, TrendingUp, TrendingDown, Minus, Monitor, Filter } from 'lucide-react';
 
-interface ChartVendor {
+interface ChartRemitter {
   _id: string;
   companyName: string;
   logo: string;
@@ -20,22 +20,22 @@ type Matrix = Record<string, Record<string, ExchangeChartCell>>;
 const TODAY = new Date().toISOString().slice(0, 10);
 
 export default function AdminExchangeChart() {
-  const [vendors, setVendors] = useState<ChartVendor[]>([]);
+  const [remitters, setRemitters] = useState<ChartRemitter[]>([]);
   const [matrix, setMatrix] = useState<Matrix>({});
   const [loading, setLoading] = useState(true);
 
   // Filters
   const [filterDate, setFilterDate] = useState(TODAY);
-  const [filterVendorId, setFilterVendorId] = useState('');
+  const [filterRemitterId, setFilterRemitterId] = useState('');
 
   // Display data (driven by filterDate — may be snapshot or live)
   const [displayCountries, setDisplayCountries] = useState<Country[]>([]);
-  const [displayVendors, setDisplayVendors] = useState<ChartVendor[]>([]);
+  const [displayRemitters, setDisplayRemitters] = useState<ChartRemitter[]>([]);
   const [displayMatrix, setDisplayMatrix] = useState<Matrix>({});
   const [displayLoading, setDisplayLoading] = useState(false);
 
   // Inline edit state
-  const [editCell, setEditCell] = useState<{ vendorId: string; currency: string } | null>(null);
+  const [editCell, setEditCell] = useState<{ remitterId: string; currency: string } | null>(null);
   const [editValue, setEditValue] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -49,7 +49,7 @@ export default function AdminExchangeChart() {
   const [snapshotsLoading, setSnapshotsLoading] = useState(false);
   const [viewDate, setViewDate] = useState<string | null>(null);
   const [historyCountries, setHistoryCountries] = useState<Country[]>([]);
-  const [historyVendors, setHistoryVendors] = useState<ChartVendor[]>([]);
+  const [historyRemitters, setHistoryRemitters] = useState<ChartRemitter[]>([]);
   const [historyMatrix, setHistoryMatrix] = useState<Matrix>({});
   const [historyLoading, setHistoryLoading] = useState(false);
 
@@ -62,11 +62,11 @@ export default function AdminExchangeChart() {
     try {
       setLoading(true);
       const res = await adminGetExchangeChart();
-      setVendors(res.data.vendors);
+      setRemitters(res.data.remitters);
       setMatrix(res.data.matrix);
       // Initialise display with live data (default date = today)
       setDisplayCountries(res.data.countries);
-      setDisplayVendors(res.data.vendors);
+      setDisplayRemitters(res.data.remitters);
       setDisplayMatrix(res.data.matrix);
     } catch {
       console.error('Failed to load exchange chart');
@@ -84,10 +84,10 @@ export default function AdminExchangeChart() {
       setDisplayLoading(true);
       try {
         const res = await adminGetExchangeChart();
-        setVendors(res.data.vendors);
+        setRemitters(res.data.remitters);
         setMatrix(res.data.matrix);
         setDisplayCountries(res.data.countries);
-        setDisplayVendors(res.data.vendors);
+        setDisplayRemitters(res.data.remitters);
         setDisplayMatrix(res.data.matrix);
       } catch {
         console.error('Failed to reload chart');
@@ -101,11 +101,11 @@ export default function AdminExchangeChart() {
     try {
       const res = await adminGetSnapshot(date);
       setDisplayCountries(res.data.countries);
-      setDisplayVendors(res.data.vendors);
+      setDisplayRemitters(res.data.remitters);
       setDisplayMatrix(res.data.matrix);
     } catch {
       setDisplayCountries([]);
-      setDisplayVendors([]);
+      setDisplayRemitters([]);
       setDisplayMatrix({});
     } finally {
       setDisplayLoading(false);
@@ -118,13 +118,13 @@ export default function AdminExchangeChart() {
   };
 
   const isEditable = filterDate === TODAY;
-  const visibleVendors = filterVendorId
-    ? displayVendors.filter(v => v._id === filterVendorId)
-    : displayVendors;
+  const visibleRemitters = filterRemitterId
+    ? displayRemitters.filter(v => v._id === filterRemitterId)
+    : displayRemitters;
 
-  const handleCellClick = (vendorId: string, currency: string) => {
-    const cell = matrix[vendorId]?.[currency];
-    setEditCell({ vendorId, currency });
+  const handleCellClick = (remitterId: string, currency: string) => {
+    const cell = matrix[remitterId]?.[currency];
+    setEditCell({ remitterId, currency });
     setEditValue(cell ? String(cell.rate) : '');
   };
 
@@ -136,7 +136,7 @@ export default function AdminExchangeChart() {
     setSaving(true);
     try {
       const res = await adminUpdateChartRate({
-        vendorId: editCell.vendorId,
+        remitterId: editCell.remitterId,
         fromCurrency: editCell.currency,
         toCurrency: 'NPR',
         rate,
@@ -144,8 +144,8 @@ export default function AdminExchangeChart() {
       // Update live matrix and display matrix
       const patch = (prev: Matrix) => ({
         ...prev,
-        [editCell!.vendorId]: {
-          ...prev[editCell!.vendorId],
+        [editCell!.remitterId]: {
+          ...prev[editCell!.remitterId],
           [editCell!.currency]: res.data.cell,
         },
       });
@@ -197,7 +197,7 @@ export default function AdminExchangeChart() {
     try {
       const res = await adminGetSnapshot(date);
       setHistoryCountries(res.data.countries);
-      setHistoryVendors(res.data.vendors);
+      setHistoryRemitters(res.data.remitters);
       setHistoryMatrix(res.data.matrix);
     } catch {
       console.error('Failed to load snapshot');
@@ -230,7 +230,7 @@ export default function AdminExchangeChart() {
 
   const renderMatrix = (
     cList: Country[],
-    vList: ChartVendor[],
+    vList: ChartRemitter[],
     m: Matrix,
     editable: boolean,
     baseMatrix?: Matrix, // previous snapshot to compare against
@@ -240,7 +240,7 @@ export default function AdminExchangeChart() {
         <thead>
           <tr className="bg-gray-50">
             <th className="sticky left-0 z-10 bg-gray-50 px-4 py-3 text-left font-semibold text-gray-700 border-b border-r min-w-[180px]">
-              Agent / Vendor
+              Remitter
             </th>
             {cList.map((c) => (
               <th key={c._id} className="px-3 py-3 text-center font-semibold text-gray-700 border-b min-w-[110px]">
@@ -262,7 +262,7 @@ export default function AdminExchangeChart() {
               {cList.map((c) => {
                 const cell = m[v._id]?.[c.currency!];
                 const baseCell = baseMatrix?.[v._id]?.[c.currency!];
-                const isEditing = editable && editCell?.vendorId === v._id && editCell?.currency === c.currency;
+                const isEditing = editable && editCell?.remitterId === v._id && editCell?.currency === c.currency;
 
                 return (
                   <td
@@ -370,7 +370,7 @@ export default function AdminExchangeChart() {
           Rates are for <strong>→ NPR</strong> conversion. Select <strong>today</strong> to edit rates; past dates are read-only snapshots; future dates show current rates as a projection.
         </p>
 
-        {/* Date + Vendor filter bar */}
+        {/* Date + Remitter filter bar */}
         <div className="flex items-center gap-4 flex-wrap bg-white border border-gray-200 rounded-xl px-4 py-3">
           <div className="flex items-center gap-2 text-gray-500">
             <Filter className="w-4 h-4" />
@@ -394,14 +394,14 @@ export default function AdminExchangeChart() {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <label className="text-xs font-medium text-gray-500">Vendor</label>
+            <label className="text-xs font-medium text-gray-500">Remitter</label>
             <select
-              value={filterVendorId}
-              onChange={e => setFilterVendorId(e.target.value)}
+              value={filterRemitterId}
+              onChange={e => setFilterRemitterId(e.target.value)}
               className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
             >
-              <option value="">All vendors</option>
-              {vendors.map(v => (
+              <option value="">All Remitters</option>
+              {remitters.map(v => (
                 <option key={v._id} value={v._id}>{v.companyName}</option>
               ))}
             </select>
@@ -424,17 +424,17 @@ export default function AdminExchangeChart() {
               <div key={i} className="animate-pulse h-12 bg-gray-100 rounded" />
             ))}
           </div>
-        ) : visibleVendors.length === 0 ? (
+        ) : visibleRemitters.length === 0 ? (
           <div className="bg-white rounded-xl shadow-sm border p-8 text-center text-gray-500">
-            {filterVendorId
-              ? 'No data for the selected vendor on this date.'
+            {filterRemitterId
+              ? 'No data for the selected Remitter on this date.'
               : filterDate < TODAY
               ? 'No snapshot found for this date. Take a snapshot first using "Take Snapshot".'
-              : 'No approved vendors found. Approve vendors first to populate the chart.'}
+              : 'No approved Remitters found. Approve Remitters first to populate the chart.'}
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-            {renderMatrix(displayCountries, visibleVendors, displayMatrix, isEditable)}
+            {renderMatrix(displayCountries, visibleRemitters, displayMatrix, isEditable)}
           </div>
         )}
 
@@ -520,13 +520,13 @@ export default function AdminExchangeChart() {
                 </h3>
                 {historyLoading ? (
                   <div className="animate-pulse h-12 bg-gray-100 rounded" />
-                ) : historyVendors.length === 0 ? (
+                ) : historyRemitters.length === 0 ? (
                   <p className="text-sm text-gray-500">No data in this snapshot.</p>
                 ) : (
                   <div className="overflow-hidden rounded-lg border">
                     {renderMatrix(
                       historyCountries,
-                      historyVendors,
+                      historyRemitters,
                       historyMatrix,
                       false,
                       compareDate && !compareLoading ? compareMatrix : undefined,

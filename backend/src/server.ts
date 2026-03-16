@@ -8,7 +8,7 @@ import connectDB from './config/db';
 
 // Import routes
 import authRoutes from './routes/auth';
-import vendorRoutes from './routes/vendors';
+import remitterRoutes from './routes/remitters';
 import rateRoutes from './routes/rates';
 import reviewRoutes from './routes/reviews';
 import blogRoutes from './routes/blogs';
@@ -75,7 +75,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/vendors', vendorRoutes);
+app.use('/api/remitters', remitterRoutes);
 app.use('/api/rates', rateRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/blogs', blogRoutes);
@@ -100,8 +100,8 @@ app.get('/api/health', (_req, res) => {
 // --- Daily rate-snapshot scheduler ---
 import DailyRateSnapshot from './models/DailyRateSnapshot';
 import RemittanceRate from './models/RemittanceRate';
-import Vendor from './models/Vendor';
-import { VendorStatus } from './types/enums';
+import Remitter from './models/Remitter';
+import { RemitterStatus } from './types/enums';
 
 async function takeDailySnapshotIfNeeded() {
   try {
@@ -109,12 +109,12 @@ async function takeDailySnapshotIfNeeded() {
     const existing = await DailyRateSnapshot.findOne({ date: today });
     if (existing) return; // already taken today
 
-    const approvedVendors = await Vendor.find({ status: VendorStatus.APPROVED }).select('_id');
-    const vendorIds = approvedVendors.map((v) => v._id);
-    const allRates = await RemittanceRate.find({ vendorId: { $in: vendorIds } });
+    const approvedRemitters = await Remitter.find({ status: RemitterStatus.APPROVED }).select('_id');
+    const remitterIds = approvedRemitters.map((v) => v._id);
+    const allRates = await RemittanceRate.find({ remitterId: { $in: remitterIds } });
 
     const rateEntries = allRates.map((r) => ({
-      vendorId: r.vendorId,
+      remitterId: r.remitterId,
       fromCurrency: r.fromCurrency,
       toCurrency: r.toCurrency,
       rate: r.rate,

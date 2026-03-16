@@ -1,28 +1,28 @@
 import { Request, Response } from 'express';
 import Review from '../models/Review';
-import Vendor from '../models/Vendor';
+import Remitter from '../models/Remitter';
 import { AuthRequest } from '../middleware/auth';
-import { VendorStatus } from '../types/enums';
+import { RemitterStatus } from '../types/enums';
 
 export const createReview = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { vendorId, rating, text } = req.body;
+    const { remitterId, rating, text } = req.body;
 
-    const vendor = await Vendor.findById(vendorId);
-    if (!vendor || vendor.status !== VendorStatus.APPROVED) {
-      res.status(404).json({ message: 'Vendor not found' });
+    const remitter = await Remitter.findById(remitterId);
+    if (!remitter || remitter.status !== RemitterStatus.APPROVED) {
+      res.status(404).json({ message: 'Remitter not found' });
       return;
     }
 
-    const existingReview = await Review.findOne({ userId: req.user!._id, vendorId });
+    const existingReview = await Review.findOne({ userId: req.user!._id, remitterId });
     if (existingReview) {
-      res.status(400).json({ message: 'You have already reviewed this vendor' });
+      res.status(400).json({ message: 'You have already reviewed this remitter' });
       return;
     }
 
     const review = await Review.create({
       userId: req.user!._id,
-      vendorId,
+      remitterId,
       rating,
       text,
     });
@@ -33,12 +33,12 @@ export const createReview = async (req: AuthRequest, res: Response): Promise<voi
   }
 };
 
-export const getVendorReviews = async (req: Request, res: Response): Promise<void> => {
+export const getRemitterReviews = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { vendorId } = req.params;
-    const reviews = await Review.find({ vendorId, isApproved: true })
+    const { remitterId } = req.params;
+    const reviews = await Review.find({ remitterId, isApproved: true })
       .populate('userId', 'name')
-      .populate('vendorId', 'companyName')
+      .populate('remitterId', 'companyName')
       .sort({ createdAt: -1 });
 
     res.json({ reviews });
@@ -51,7 +51,7 @@ export const getLatestReviews = async (_req: Request, res: Response): Promise<vo
   try {
     const reviews = await Review.find({ isApproved: true })
       .populate('userId', 'name')
-      .populate('vendorId', 'companyName logo')
+      .populate('remitterId', 'companyName logo')
       .sort({ createdAt: -1 })
       .limit(6);
 

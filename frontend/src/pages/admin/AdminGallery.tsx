@@ -3,7 +3,7 @@ import { Images, Upload, Search, Trash2, ChevronLeft, ChevronRight } from 'lucid
 import { adminListGallery, adminUploadToGallery, adminDeleteGalleryFile } from '../../api';
 import type { GalleryFile } from '../../types';
 
-const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5003/api').replace(/\/api$/, '');
+const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5000/api').replace(/\/api$/, '');
 const resolveUrl = (url: string) => (url?.startsWith('/') ? `${API_BASE}${url}` : url);
 const fmtBytes = (b: number) =>
   b < 1024 ? `${b} B` : b < 1024 * 1024 ? `${(b / 1024).toFixed(0)} KB` : `${(b / (1024 * 1024)).toFixed(1)} MB`;

@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import PartnerRoute from '../models/PartnerRoute';
 import Partner from '../models/Partner';
-import Vendor from '../models/Vendor';
+import Remitter from '../models/Remitter';
 import { AuthRequest } from '../middleware/auth';
 
 const POPULATE = [
   { path: 'sendCountry', select: 'name code flag' },
   { path: 'receiveCountry', select: 'name code flag' },
-  { path: 'partner', select: 'name logoUrl website description featured vendorId' },
+  { path: 'partner', select: 'name logoUrl website description featured remitterId' },
 ];
 
 export const getPartnerRoutes = async (_req: Request, res: Response): Promise<void> => {
@@ -34,13 +34,13 @@ export const adminGetPartnerRoutes = async (_req: Request, res: Response): Promi
 
 export const createPartnerRoute = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { sendCountry, receiveCountry, isActive, description, featured, vendorId } = req.body;
+    const { sendCountry, receiveCountry, isActive, description, featured, remitterId } = req.body;
 
-    // Derive partner name from the linked vendor, fallback to corridor placeholder
+    // Derive partner name from the linked remitter, fallback to corridor placeholder
     let derivedName = 'Partner';
-    if (vendorId) {
-      const vendor = await Vendor.findById(vendorId).select('companyName website logo');
-      if (vendor) derivedName = vendor.companyName;
+    if (remitterId) {
+      const remitter = await Remitter.findById(remitterId).select('companyName website logo');
+      if (remitter) derivedName = remitter.companyName;
     }
 
     // Create partner record first
@@ -52,7 +52,7 @@ export const createPartnerRoute = async (req: AuthRequest, res: Response): Promi
       website: '',
       description: description || '',
       featured: featured ?? false,
-      vendorId: vendorId || null,
+      remitterId: remitterId || null,
       isActive: true,
     });
 
@@ -70,7 +70,7 @@ export const createPartnerRoute = async (req: AuthRequest, res: Response): Promi
 
 export const updatePartnerRoute = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { sendCountry, receiveCountry, isActive, description, featured, vendorId } = req.body;
+    const { sendCountry, receiveCountry, isActive, description, featured, remitterId } = req.body;
 
     const existing = await PartnerRoute.findById(req.params.id);
     if (!existing) {
@@ -78,11 +78,11 @@ export const updatePartnerRoute = async (req: AuthRequest, res: Response): Promi
       return;
     }
 
-    // Derive partner name from the linked vendor
+    // Derive partner name from the linked remitter
     let derivedName = 'Partner';
-    if (vendorId) {
-      const vendor = await Vendor.findById(vendorId).select('companyName');
-      if (vendor) derivedName = vendor.companyName;
+    if (remitterId) {
+      const remitter = await Remitter.findById(remitterId).select('companyName');
+      if (remitter) derivedName = remitter.companyName;
     }
 
     const partnerData = {
@@ -93,7 +93,7 @@ export const updatePartnerRoute = async (req: AuthRequest, res: Response): Promi
       website: '',
       description: description || '',
       featured: featured ?? false,
-      vendorId: vendorId || null,
+      remitterId: remitterId || null,
     };
 
     // Update existing partner or create one if missing

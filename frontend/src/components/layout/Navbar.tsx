@@ -1,13 +1,26 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Menu, X, User, LogOut } from 'lucide-react';
+import { Menu, X, User, LogOut, LayoutDashboard, UserCog } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -18,7 +31,7 @@ export default function Navbar() {
     { to: '/', label: 'Home' },
     { to: '/best-rates', label: 'Best Rate' },
     { to: '/forex', label: 'Forex' },
-    { to: '/agents', label: 'Agents' },
+    { to: '/remitters', label: 'Remitters' },
     { to: '/contact', label: 'Contact Us' },
   ];
 
@@ -47,20 +60,55 @@ export default function Navbar() {
           {/* Auth Actions */}
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
-              <div className="flex items-center space-x-3">
-                <Link
-                  to={user.role === 'admin' ? '/admin' : user.role === 'vendor' ? '/vendor/dashboard' : '/profile'}
+              <div className="relative" ref={profileRef}>
+                <button
+                  onClick={() => setProfileOpen(!profileOpen)}
                   className="flex items-center space-x-1 text-gray-600 hover:text-green-600"
                 >
                   <User className="w-4 h-4" />
                   <span className="text-sm font-medium">{user.name}</span>
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center space-x-1 text-gray-500 hover:text-red-600"
-                >
-                  <LogOut className="w-4 h-4" />
                 </button>
+
+                {profileOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                    {(user.role === 'admin' || user.role === 'editor') && (
+                      <Link
+                        to="/admin"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600"
+                        onClick={() => setProfileOpen(false)}
+                      >
+                        <LayoutDashboard className="w-4 h-4" />
+                        Dashboard
+                      </Link>
+                    )}
+                    {user.role === 'remitter' && (
+                      <Link
+                        to="/remitter/dashboard"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600"
+                        onClick={() => setProfileOpen(false)}
+                      >
+                        <LayoutDashboard className="w-4 h-4" />
+                        Dashboard
+                      </Link>
+                    )}
+                    <Link
+                      to={user.role === 'admin' || user.role === 'editor' ? '/admin/profile' : '/profile'}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      <UserCog className="w-4 h-4" />
+                      Manage Profile
+                    </Link>
+                    <div className="border-t border-gray-100 my-1" />
+                    <button
+                      onClick={() => { setProfileOpen(false); handleLogout(); }}
+                      className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <>
@@ -74,7 +122,7 @@ export default function Navbar() {
                   to="/join-us"
                   className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium transition-colors"
                 >
-                  Join Us
+                  Become a Remitter
                 </Link>
               </>
             )}
@@ -112,12 +160,44 @@ export default function Navbar() {
                   className="block px-3 py-2 bg-green-600 text-white rounded-lg text-center"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Join Us
+                  Become a Remitter
                 </Link>
               </div>
             ) : (
-              <div className="pt-2 border-t">
-                <button onClick={handleLogout} className="block w-full text-left px-3 py-2 text-red-600">
+              <div className="pt-2 space-y-1 border-t">
+                {(user.role === 'admin' || user.role === 'editor') && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-lg"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </Link>
+                )}
+                {user.role === 'remitter' && (
+                  <Link
+                    to="/remitter/dashboard"
+                    className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-lg"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </Link>
+                )}
+                <Link
+                  to={user.role === 'admin' || user.role === 'editor' ? '/admin/profile' : '/profile'}
+                  className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-lg"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <UserCog className="w-4 h-4" />
+                  Manage Profile
+                </Link>
+                <button
+                  onClick={() => { setMobileOpen(false); handleLogout(); }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+                >
+                  <LogOut className="w-4 h-4" />
                   Logout
                 </button>
               </div>

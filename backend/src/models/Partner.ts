@@ -9,7 +9,7 @@ export interface IPartner extends Document {
   description: string;
   isActive: boolean;
   featured: boolean;
-  vendorId?: Types.ObjectId; // linked Vendor — rates from this vendor are pinned first in search results
+  remitterId?: Types.ObjectId; // linked Remitter — rates from this remitter are pinned first in search results
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,7 +24,7 @@ const partnerSchema = new Schema<IPartner>(
     description: { type: String, trim: true, default: '' },
     isActive: { type: Boolean, default: true },
     featured: { type: Boolean, default: false },
-    vendorId: { type: Schema.Types.ObjectId, ref: 'Vendor', default: null },
+    remitterId: { type: Schema.Types.ObjectId, ref: 'Remitter', default: null },
   },
   { timestamps: true }
 );

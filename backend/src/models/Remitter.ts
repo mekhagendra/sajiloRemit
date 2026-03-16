@@ -1,24 +1,24 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { VendorStatus } from '../types/enums';
+import { RemitterStatus } from '../types/enums';
 
-export interface IVendorCountry {
+export interface IRemitterCountry {
   countryCode: string;
   canSend: boolean;
   canReceive: boolean;
   isActive: boolean; // toggled by admin to enable/disable service in this country
 }
 
-export interface IVendor extends Document {
+export interface IRemitter extends Document {
   userId: mongoose.Types.ObjectId;
   companyName: string;
   baseCountry: string;
-  supportedCountries: IVendorCountry[];
+  supportedCountries: IRemitterCountry[];
   email: string;
   phone: string;
   website: string;
   description: string;
   logo: string;
-  status: VendorStatus;
+  status: RemitterStatus;
   apiIntegration?: {
     enabled: boolean;
     apiUrl?: string;
@@ -28,7 +28,7 @@ export interface IVendor extends Document {
   updatedAt: Date;
 }
 
-const vendorCountrySchema = new Schema<IVendorCountry>(
+const remitterCountrySchema = new Schema<IRemitterCountry>(
   {
     countryCode: { type: String, required: true, uppercase: true, trim: true },
     canSend:     { type: Boolean, default: false },
@@ -38,12 +38,12 @@ const vendorCountrySchema = new Schema<IVendorCountry>(
   { _id: false }
 );
 
-const vendorSchema = new Schema<IVendor>(
+const remitterSchema = new Schema<IRemitter>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     companyName: { type: String, required: true, trim: true },
     baseCountry: { type: String, required: true },
-    supportedCountries: [vendorCountrySchema],
+    supportedCountries: [remitterCountrySchema],
     email: { type: String, required: true, lowercase: true, trim: true },
     phone: { type: String, required: true },
     website: { type: String, trim: true },
@@ -51,8 +51,8 @@ const vendorSchema = new Schema<IVendor>(
     logo: { type: String, default: '' },
     status: {
       type: String,
-      enum: Object.values(VendorStatus),
-      default: VendorStatus.PENDING,
+      enum: Object.values(RemitterStatus),
+      default: RemitterStatus.PENDING,
     },
     apiIntegration: {
       enabled: { type: Boolean, default: false },
@@ -63,4 +63,4 @@ const vendorSchema = new Schema<IVendor>(
   { timestamps: true }
 );
 
-export default mongoose.model<IVendor>('Vendor', vendorSchema);
+export default mongoose.model<IRemitter>('Remitter', remitterSchema);

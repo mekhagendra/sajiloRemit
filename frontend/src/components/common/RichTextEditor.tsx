@@ -11,10 +11,11 @@ interface Props {
 export default function RichTextEditor({ value, onChange }: Props) {
   return (
     <div className="border border-gray-300 rounded-lg overflow-hidden [&_.ck-editor\_\_editable]:min-h-[300px] [&_.ck-editor\_\_editable]:px-4 [&_.ck-editor\_\_editable]:py-3">
-      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       <CKEditor
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         editor={ClassicEditor as any}
         data={value}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onChange={(_event: unknown, editor: any) => {
           onChange(editor.getData());
         }}

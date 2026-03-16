@@ -9,7 +9,7 @@ export interface IUser extends Document {
   role: UserRole;
   status: UserStatus;
   suspendReason?: string;
-  favoriteVendors: mongoose.Types.ObjectId[];
+  favoriteRemitters: mongoose.Types.ObjectId[];
   rateAlerts: {
     fromCurrency: string;
     toCurrency: string;
@@ -28,7 +28,7 @@ const userSchema = new Schema<IUser>(
     role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
     status: { type: String, enum: Object.values(UserStatus), default: UserStatus.ACTIVE },
     suspendReason: { type: String },
-    favoriteVendors: [{ type: Schema.Types.ObjectId, ref: 'Vendor' }],
+    favoriteRemitters: [{ type: Schema.Types.ObjectId, ref: 'Remitter' }],
     rateAlerts: [
       {
         fromCurrency: { type: String, required: true },

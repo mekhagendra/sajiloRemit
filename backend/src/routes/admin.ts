@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import {
-  getAllVendors,
-  updateVendorStatus,
-  adminCreateAgent,
-  adminGetVendorRates,
-  adminCreateRateForVendor,
-  adminUpdateRateForVendor,
-  adminDeleteRateForVendor,
-  adminToggleVendorCountry,
+  getAllRemitters,
+  updateRemitterStatus,
+  adminCreateRemitter,
+  adminGetRemitterRates,
+  adminCreateRateForRemitter,
+  adminUpdateRateForRemitter,
+  adminDeleteRateForRemitter,
+  adminToggleRemitterCountry,
   getAllUsers,
   updateUserStatus,
   getAllReviews,
@@ -15,6 +15,10 @@ import {
   deleteReview,
   getStatistics,
   getAllBlogs,
+  getAllEditors,
+  createEditor,
+  updateEditor,
+  deleteEditor,
 } from '../controllers/adminController';
 import { authenticate, authorize } from '../middleware/auth';
 import { UserRole } from '../types/enums';
@@ -23,14 +27,14 @@ const router = Router();
 
 router.use(authenticate, authorize(UserRole.ADMIN));
 
-router.get('/vendors', getAllVendors);
-router.post('/vendors', adminCreateAgent);
-router.put('/vendors/:id/status', updateVendorStatus);
-router.get('/vendors/:id/rates', adminGetVendorRates);
-router.post('/vendors/:id/rates', adminCreateRateForVendor);
-router.put('/vendors/:id/rates/:rateId', adminUpdateRateForVendor);
-router.delete('/vendors/:id/rates/:rateId', adminDeleteRateForVendor);
-router.put('/vendors/:id/countries/:code', adminToggleVendorCountry);
+router.get('/remitters', getAllRemitters);
+router.post('/remitters', adminCreateRemitter);
+router.put('/remitters/:id/status', updateRemitterStatus);
+router.get('/remitters/:id/rates', adminGetRemitterRates);
+router.post('/remitters/:id/rates', adminCreateRateForRemitter);
+router.put('/remitters/:id/rates/:rateId', adminUpdateRateForRemitter);
+router.delete('/remitters/:id/rates/:rateId', adminDeleteRateForRemitter);
+router.put('/remitters/:id/countries/:code', adminToggleRemitterCountry);
 router.get('/users', getAllUsers);
 router.put('/users/:id/status', updateUserStatus);
 router.get('/reviews', getAllReviews);
@@ -38,5 +42,11 @@ router.put('/reviews/:id', moderateReview);
 router.delete('/reviews/:id', deleteReview);
 router.get('/blogs', getAllBlogs);
 router.get('/statistics', getStatistics);
+
+// Editor management
+router.get('/editors', getAllEditors);
+router.post('/editors', createEditor);
+router.put('/editors/:id', updateEditor);
+router.delete('/editors/:id', deleteEditor);
 
 export default router;

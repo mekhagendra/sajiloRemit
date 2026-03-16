@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getMyVendorProfile, updateMyVendorProfile, getMyRates, addRate, updateRate, deleteRate, upsertVendorCountry, removeVendorCountry } from '../api';
-import type { Vendor, RemittanceRate, VendorCountry } from '../types';
+import { getMyRemitterProfile, updateMyRemitterProfile, getMyRates, addRate, updateRate, deleteRate, upsertRemitterCountry, removeRemitterCountry } from '../api';
+import type { Remitter, RemittanceRate, RemitterCountry } from '../types';
 import { COUNTRY_LIST, getCountryByCode } from '../constants/countries';
 import { PlusCircle, Trash2, Pencil, X, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
 
@@ -14,17 +14,17 @@ const STATUS_STYLES: Record<string, { bg: string; text: string; icon: React.Reac
 };
 
 const STATUS_MESSAGES: Record<string, string> = {
-  pending:  'Your vendor application is under review. You will be notified once approved.',
-  rejected: 'Your vendor application was rejected. Please contact support for more information.',
-  suspended:'Your vendor account has been suspended. Please contact support.',
+  pending:  'Your remitter application is under review. You will be notified once approved.',
+  rejected: 'Your remitter application was rejected. Please contact support for more information.',
+  suspended:'Your remitter account has been suspended. Please contact support.',
 };
 
 const EMPTY_RATE = { fromCurrency: '', toCurrency: '', rate: '', unit: '1', fee: '0' };
 
-export default function VendorDashboard() {
+export default function RemitterDashboard() {
   const { user, loading: authLoading } = useAuth();
 
-  const [vendor, setVendor] = useState<Vendor | null>(null);
+  const [remitter, setRemitter] = useState<Remitter | null>(null);
   const [rates, setRates] = useState<RemittanceRate[]>([]);
   const [pageLoading, setPageLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -43,7 +43,7 @@ export default function VendorDashboard() {
 
   // Profile edit
   const [editingProfile, setEditingProfile] = useState(false);
-  const [profileForm, setProfileForm] = useState<Partial<Vendor>>({});
+  const [profileForm, setProfileForm] = useState<Partial<Remitter>>({});
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileError, setProfileError] = useState('');
 
@@ -56,9 +56,9 @@ export default function VendorDashboard() {
 
   useEffect(() => {
     if (authLoading) return;
-    Promise.all([getMyVendorProfile(), getMyRates()])
+    Promise.all([getMyRemitterProfile(), getMyRates()])
       .then(([vRes, rRes]) => {
-        setVendor(vRes.data.vendor);
+        setRemitter(vRes.data.remitter);
         setRates(rRes.data.rates);
       })
       .catch((err) => {
@@ -75,29 +75,29 @@ export default function VendorDashboard() {
     );
   }
 
-  if (!user || user.role !== 'vendor') return <Navigate to="/login" replace />;
+  if (!user || user.role !== 'remitter') return <Navigate to="/login" replace />;
 
   if (notFound) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-3">No Vendor Profile Found</h2>
-        <p className="text-gray-500 mb-6">You don't have a vendor profile yet. Register to get started.</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-3">No Remitter Profile Found</h2>
+        <p className="text-gray-500 mb-6">You don't have a remitter profile yet. Register to get started.</p>
         <a href="/join-us" className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-medium">
-          Register as Vendor
+          Register as Remitter
         </a>
       </div>
     );
   }
 
-  const status = vendor?.status ?? 'pending';
+  const status = remitter?.status ?? 'pending';
   const statusStyle = STATUS_STYLES[status] ?? STATUS_STYLES.pending;
   const isApproved = status === 'approved';
-  const addedCodes = new Set((vendor?.supportedCountries ?? []).map((c) => c.countryCode));
+  const addedCodes = new Set((remitter?.supportedCountries ?? []).map((c) => c.countryCode));
   const availableToAdd = COUNTRY_LIST.filter((c) => !addedCodes.has(c.code));
 
   // Currencies whose countries have been activated by admin
   const approvedCurrencies = new Set(
-    (vendor?.supportedCountries ?? [])
+    (remitter?.supportedCountries ?? [])
       .filter((sc) => sc.isActive)
       .map((sc) => getCountryByCode(sc.countryCode)?.currency)
       .filter((c): c is string => Boolean(c))
@@ -112,12 +112,12 @@ export default function VendorDashboard() {
 
   const openEditProfile = () => {
     setProfileForm({
-      companyName: vendor?.companyName ?? '',
-      email: vendor?.email ?? '',
-      phone: vendor?.phone ?? '',
-      website: vendor?.website ?? '',
-      description: vendor?.description ?? '',
-      baseCountry: vendor?.baseCountry ?? '',
+      companyName: remitter?.companyName ?? '',
+      email: remitter?.email ?? '',
+      phone: remitter?.phone ?? '',
+      website: remitter?.website ?? '',
+      description: remitter?.description ?? '',
+      baseCountry: remitter?.baseCountry ?? '',
     });
     setProfileError('');
     setEditingProfile(true);
@@ -128,8 +128,8 @@ export default function VendorDashboard() {
     setProfileSaving(true);
     setProfileError('');
     try {
-      const res = await updateMyVendorProfile(profileForm);
-      setVendor(res.data.vendor);
+      const res = await updateMyRemitterProfile(profileForm);
+      setRemitter(res.data.remitter);
       setEditingProfile(false);
     } catch (err) {
       const e = err as { response?: { data?: { message?: string } } };
@@ -195,10 +195,10 @@ export default function VendorDashboard() {
     }
   };
 
-  const handleToggleCountryFlag = async (c: VendorCountry, field: 'canSend' | 'canReceive') => {
+  const handleToggleCountryFlag = async (c: RemitterCountry, field: 'canSend' | 'canReceive') => {
     try {
-      const res = await upsertVendorCountry({ countryCode: c.countryCode, canSend: field === 'canSend' ? !c.canSend : c.canSend, canReceive: field === 'canReceive' ? !c.canReceive : c.canReceive });
-      setVendor(res.data.vendor);
+      const res = await upsertRemitterCountry({ countryCode: c.countryCode, canSend: field === 'canSend' ? !c.canSend : c.canSend, canReceive: field === 'canReceive' ? !c.canReceive : c.canReceive });
+      setRemitter(res.data.remitter);
     } catch { alert('Failed to update country.'); }
   };
 
@@ -206,8 +206,8 @@ export default function VendorDashboard() {
     if (!newCountryCode) return;
     setCountrySaving(true);
     try {
-      const res = await upsertVendorCountry({ countryCode: newCountryCode, canSend: newCanSend, canReceive: newCanReceive });
-      setVendor(res.data.vendor);
+      const res = await upsertRemitterCountry({ countryCode: newCountryCode, canSend: newCanSend, canReceive: newCanReceive });
+      setRemitter(res.data.remitter);
       setShowAddCountry(false);
       setNewCountryCode('');
       setNewCanSend(false);
@@ -219,8 +219,8 @@ export default function VendorDashboard() {
   const handleRemoveCountry = async (code: string) => {
     if (!confirm('Remove this country from your supported list?')) return;
     try {
-      const res = await removeVendorCountry(code);
-      setVendor(res.data.vendor);
+      const res = await removeRemitterCountry(code);
+      setRemitter(res.data.remitter);
     } catch { alert('Failed to remove country.'); }
   };
 
@@ -229,8 +229,8 @@ export default function VendorDashboard() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{vendor?.companyName}</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{vendor?.email}</p>
+          <h1 className="text-2xl font-bold text-gray-900">{remitter?.companyName}</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{remitter?.email}</p>
         </div>
         <button onClick={openEditProfile} className="flex items-center gap-1.5 text-sm border border-gray-300 rounded-lg px-3 py-2 hover:bg-gray-50 text-gray-700">
           <Pencil className="w-4 h-4" /> Edit Profile
@@ -250,11 +250,11 @@ export default function VendorDashboard() {
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Profile Details</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-          <div><span className="text-gray-500">Base Country:</span> <span className="ml-2 font-medium text-gray-800">{vendor?.baseCountry || '—'}</span></div>
-          <div><span className="text-gray-500">Phone:</span> <span className="ml-2 font-medium text-gray-800">{vendor?.phone || '—'}</span></div>
-          <div><span className="text-gray-500">Website:</span> <span className="ml-2 font-medium text-gray-800">{vendor?.website || '—'}</span></div>
-          {vendor?.description && (
-            <div className="sm:col-span-2"><span className="text-gray-500">Description:</span> <span className="ml-2 text-gray-800">{vendor.description}</span></div>
+          <div><span className="text-gray-500">Base Country:</span> <span className="ml-2 font-medium text-gray-800">{remitter?.baseCountry || '—'}</span></div>
+          <div><span className="text-gray-500">Phone:</span> <span className="ml-2 font-medium text-gray-800">{remitter?.phone || '—'}</span></div>
+          <div><span className="text-gray-500">Website:</span> <span className="ml-2 font-medium text-gray-800">{remitter?.website || '—'}</span></div>
+          {remitter?.description && (
+            <div className="sm:col-span-2"><span className="text-gray-500">Description:</span> <span className="ml-2 text-gray-800">{remitter.description}</span></div>
           )}
         </div>
       </div>
@@ -274,7 +274,7 @@ export default function VendorDashboard() {
           </button>
         </div>
 
-        {(vendor?.supportedCountries ?? []).length === 0 && !showAddCountry ? (
+        {(remitter?.supportedCountries ?? []).length === 0 && !showAddCountry ? (
           <p className="text-sm text-gray-400">No countries added yet.</p>
         ) : (
           <table className="w-full text-sm">
@@ -289,7 +289,7 @@ export default function VendorDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {(vendor?.supportedCountries ?? []).map((c) => {
+              {(remitter?.supportedCountries ?? []).map((c) => {
                 const info = getCountryByCode(c.countryCode);
                 return (
                   <tr key={c.countryCode} className="hover:bg-gray-50">

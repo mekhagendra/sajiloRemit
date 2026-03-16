@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { COUNTRY_LIST } from '../../constants/countries';
-import { fetchAllBanners } from '../common/BannerAd';
+import { fetchAllBanners } from '../common/bannerCache';
 
-const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5003/api').replace(/\/api$/, '');
+const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5000/api').replace(/\/api$/, '');
 const resolveUrl = (url: string) => (url?.startsWith('/') ? `${API_BASE}${url}` : url);
 
 // Exclude Nepal (destination) from the "Send From" list

@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
 import { config } from './config';
 import User from './models/User';
-import Vendor from './models/Vendor';
+import Remitter from './models/Remitter';
 import RemittanceRate from './models/RemittanceRate';
 import BankInterestRate from './models/BankInterestRate';
 import Bank from './models/Bank';
 import Blog from './models/Blog';
 import Review from './models/Review';
-import { UserRole, VendorStatus } from './types/enums';
+import { UserRole, RemitterStatus } from './types/enums';
 
 const seed = async () => {
   await mongoose.connect(config.mongodbUri);
@@ -16,7 +16,7 @@ const seed = async () => {
   // Clear existing data
   await Promise.all([
     User.deleteMany({}),
-    Vendor.deleteMany({}),
+    Remitter.deleteMany({}),
     RemittanceRate.deleteMany({}),
     BankInterestRate.deleteMany({}),
     Bank.deleteMany({}),
@@ -32,26 +32,26 @@ const seed = async () => {
     role: UserRole.ADMIN,
   });
 
-  // Create vendor users
-  const vendorUser1 = await User.create({
+  // Create remitter users
+  const remitterUser1 = await User.create({
     name: 'WorldRemit Agent',
     email: 'vendor1@sajiloremit.com',
     password: 'vendor123',
-    role: UserRole.VENDOR,
+    role: UserRole.REMITTER,
   });
 
-  const vendorUser2 = await User.create({
+  const remitterUser2 = await User.create({
     name: 'Remitly Agent',
     email: 'vendor2@sajiloremit.com',
     password: 'vendor123',
-    role: UserRole.VENDOR,
+    role: UserRole.REMITTER,
   });
 
-  const vendorUser3 = await User.create({
+  const remitterUser3 = await User.create({
     name: 'Western Union Agent',
     email: 'vendor3@sajiloremit.com',
     password: 'vendor123',
-    role: UserRole.VENDOR,
+    role: UserRole.REMITTER,
   });
 
   // Create regular users
@@ -69,9 +69,9 @@ const seed = async () => {
     role: UserRole.USER,
   });
 
-  // Create vendors
-  const vendor1 = await Vendor.create({
-    userId: vendorUser1._id,
+  // Create remitters
+  const remitter1 = await Remitter.create({
+    userId: remitterUser1._id,
     companyName: 'WorldRemit',
     baseCountry: 'Australia',
     supportedCountries: [
@@ -84,11 +84,11 @@ const seed = async () => {
     website: 'https://www.worldremit.com',
     description: 'Send money online to Nepal with WorldRemit.',
     logo: '',
-    status: VendorStatus.APPROVED,
+    status: RemitterStatus.APPROVED,
   });
 
-  const vendor2 = await Vendor.create({
-    userId: vendorUser2._id,
+  const remitter2 = await Remitter.create({
+    userId: remitterUser2._id,
     companyName: 'Remitly',
     baseCountry: 'Australia',
     supportedCountries: [
@@ -101,11 +101,11 @@ const seed = async () => {
     website: 'https://www.remitly.com',
     description: 'Fast, reliable money transfers to Nepal.',
     logo: '',
-    status: VendorStatus.APPROVED,
+    status: RemitterStatus.APPROVED,
   });
 
-  const vendor3 = await Vendor.create({
-    userId: vendorUser3._id,
+  const remitter3 = await Remitter.create({
+    userId: remitterUser3._id,
     companyName: 'Western Union',
     baseCountry: 'United States',
     supportedCountries: [
@@ -119,24 +119,24 @@ const seed = async () => {
     website: 'https://www.westernunion.com',
     description: 'Trusted worldwide money transfer service.',
     logo: '',
-    status: VendorStatus.APPROVED,
+    status: RemitterStatus.APPROVED,
   });
 
   // Create remittance rates
   const rates = [
-    { vendorId: vendor1._id, fromCurrency: 'AUD', toCurrency: 'NPR', rate: 88.35, unit: 1, fee: 3.99 },
-    { vendorId: vendor1._id, fromCurrency: 'USD', toCurrency: 'NPR', rate: 133.50, unit: 1, fee: 2.99 },
-    { vendorId: vendor1._id, fromCurrency: 'GBP', toCurrency: 'NPR', rate: 168.20, unit: 1, fee: 2.49 },
-    { vendorId: vendor2._id, fromCurrency: 'AUD', toCurrency: 'NPR', rate: 88.10, unit: 1, fee: 3.49 },
-    { vendorId: vendor2._id, fromCurrency: 'USD', toCurrency: 'NPR', rate: 133.20, unit: 1, fee: 1.99 },
-    { vendorId: vendor2._id, fromCurrency: 'GBP', toCurrency: 'NPR', rate: 167.80, unit: 1, fee: 2.99 },
-    { vendorId: vendor2._id, fromCurrency: 'EUR', toCurrency: 'NPR', rate: 145.30, unit: 1, fee: 2.99 },
-    { vendorId: vendor3._id, fromCurrency: 'AUD', toCurrency: 'NPR', rate: 88.55, unit: 1, fee: 4.99 },
-    { vendorId: vendor3._id, fromCurrency: 'USD', toCurrency: 'NPR', rate: 133.80, unit: 1, fee: 4.99 },
-    { vendorId: vendor3._id, fromCurrency: 'GBP', toCurrency: 'NPR', rate: 168.50, unit: 1, fee: 3.99 },
-    { vendorId: vendor3._id, fromCurrency: 'EUR', toCurrency: 'NPR', rate: 145.60, unit: 1, fee: 3.99 },
-    { vendorId: vendor3._id, fromCurrency: 'CAD', toCurrency: 'NPR', rate: 98.20, unit: 1, fee: 3.99 },
-    { vendorId: vendor3._id, fromCurrency: 'JPY', toCurrency: 'NPR', rate: 0.89, unit: 1, fee: 4.99 },
+    { remitterId: remitter1._id, fromCurrency: 'AUD', toCurrency: 'NPR', rate: 88.35, unit: 1, fee: 3.99 },
+    { remitterId: remitter1._id, fromCurrency: 'USD', toCurrency: 'NPR', rate: 133.50, unit: 1, fee: 2.99 },
+    { remitterId: remitter1._id, fromCurrency: 'GBP', toCurrency: 'NPR', rate: 168.20, unit: 1, fee: 2.49 },
+    { remitterId: remitter2._id, fromCurrency: 'AUD', toCurrency: 'NPR', rate: 88.10, unit: 1, fee: 3.49 },
+    { remitterId: remitter2._id, fromCurrency: 'USD', toCurrency: 'NPR', rate: 133.20, unit: 1, fee: 1.99 },
+    { remitterId: remitter2._id, fromCurrency: 'GBP', toCurrency: 'NPR', rate: 167.80, unit: 1, fee: 2.99 },
+    { remitterId: remitter2._id, fromCurrency: 'EUR', toCurrency: 'NPR', rate: 145.30, unit: 1, fee: 2.99 },
+    { remitterId: remitter3._id, fromCurrency: 'AUD', toCurrency: 'NPR', rate: 88.55, unit: 1, fee: 4.99 },
+    { remitterId: remitter3._id, fromCurrency: 'USD', toCurrency: 'NPR', rate: 133.80, unit: 1, fee: 4.99 },
+    { remitterId: remitter3._id, fromCurrency: 'GBP', toCurrency: 'NPR', rate: 168.50, unit: 1, fee: 3.99 },
+    { remitterId: remitter3._id, fromCurrency: 'EUR', toCurrency: 'NPR', rate: 145.60, unit: 1, fee: 3.99 },
+    { remitterId: remitter3._id, fromCurrency: 'CAD', toCurrency: 'NPR', rate: 98.20, unit: 1, fee: 3.99 },
+    { remitterId: remitter3._id, fromCurrency: 'JPY', toCurrency: 'NPR', rate: 0.89, unit: 1, fee: 4.99 },
   ];
   await RemittanceRate.insertMany(rates);
 
@@ -198,16 +198,16 @@ const seed = async () => {
 
   // Create reviews
   await Review.insertMany([
-    { userId: user1._id, vendorId: vendor1._id, rating: 4, text: 'Great service, fast transfers to Nepal!', isApproved: true },
-    { userId: user2._id, vendorId: vendor1._id, rating: 5, text: 'Very reliable and competitive rates.', isApproved: true },
-    { userId: user1._id, vendorId: vendor2._id, rating: 4, text: 'Good rates but transfer took a bit longer than expected.', isApproved: true },
-    { userId: user2._id, vendorId: vendor3._id, rating: 3, text: 'Trusted service but fees are a bit high.', isApproved: true },
+    { userId: user1._id, remitterId: remitter1._id, rating: 4, text: 'Great service, fast transfers to Nepal!', isApproved: true },
+    { userId: user2._id, remitterId: remitter1._id, rating: 5, text: 'Very reliable and competitive rates.', isApproved: true },
+    { userId: user1._id, remitterId: remitter2._id, rating: 4, text: 'Good rates but transfer took a bit longer than expected.', isApproved: true },
+    { userId: user2._id, remitterId: remitter3._id, rating: 3, text: 'Trusted service but fees are a bit high.', isApproved: true },
   ]);
 
   console.log('Seed data created successfully!');
   console.log('\nTest Accounts:');
   console.log('Admin: admin@sajiloremit.com / admin123');
-  console.log('Vendor: vendor1@sajiloremit.com / vendor123');
+  console.log('Remitter: vendor1@sajiloremit.com / vendor123');
   console.log('User: user1@sajiloremit.com / user123');
 
   await mongoose.disconnect();

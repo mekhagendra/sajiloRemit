@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerVendor } from '../api';
+import { registerRemitter } from '../api';
 import { useAuth } from '../context/AuthContext';
 
-export default function VendorRegisterPage() {
+export default function RemitterRegisterPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [form, setForm] = useState({
@@ -20,7 +20,7 @@ export default function VendorRegisterPage() {
   if (!user) {
     return (
       <div className="max-w-lg mx-auto px-4 py-16 text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Register as a Vendor</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Register as a Remitter</h2>
         <p className="text-gray-600 mb-6">Please login or create an account first to register your remittance business.</p>
         <a href="/login" className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-medium">
           Login
@@ -39,7 +39,7 @@ export default function VendorRegisterPage() {
     setLoading(true);
 
     try {
-      await registerVendor(form);
+      await registerRemitter(form);
       navigate('/');
     } catch (err) {
       setError((err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Registration failed');
@@ -50,7 +50,7 @@ export default function VendorRegisterPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">Register as a Vendor</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">Register as a Remitter</h1>
       <p className="text-gray-600 mb-8">Register your remittance business on SajiloRemit. Your application will be reviewed by admin.<br/><span className="text-sm text-green-700 font-medium">You can manage supported countries from your dashboard after registration.</span></p>
 
       {error && <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">{error}</div>}

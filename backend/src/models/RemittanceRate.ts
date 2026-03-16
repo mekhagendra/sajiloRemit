@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IRemittanceRate extends Document {
-  vendorId: mongoose.Types.ObjectId;
+  remitterId: mongoose.Types.ObjectId;
   fromCurrency: string;
   toCurrency: string;
   rate: number;
@@ -13,7 +13,7 @@ export interface IRemittanceRate extends Document {
 
 const remittanceRateSchema = new Schema<IRemittanceRate>(
   {
-    vendorId: { type: Schema.Types.ObjectId, ref: 'Vendor', required: true },
+    remitterId: { type: Schema.Types.ObjectId, ref: 'Remitter', required: true },
     fromCurrency: { type: String, required: true, uppercase: true, trim: true },
     toCurrency: { type: String, required: true, uppercase: true, trim: true },
     rate: { type: Number, required: true },
@@ -24,6 +24,6 @@ const remittanceRateSchema = new Schema<IRemittanceRate>(
 );
 
 remittanceRateSchema.index({ fromCurrency: 1, toCurrency: 1, rate: -1 });
-remittanceRateSchema.index({ vendorId: 1 });
+remittanceRateSchema.index({ remitterId: 1 });
 
 export default mongoose.model<IRemittanceRate>('RemittanceRate', remittanceRateSchema);

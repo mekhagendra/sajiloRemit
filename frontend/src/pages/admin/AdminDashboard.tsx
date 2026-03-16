@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { adminGetStatistics, adminGetVendors, adminGetReviews } from '../../api';
-import type { Statistics, Vendor, Review } from '../../types';
+import { adminGetStatistics, adminGetRemitters, adminGetReviews } from '../../api';
+import type { Statistics, Remitter, Review } from '../../types';
 import { Users, Building2, MessageSquare, BarChart2 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -10,23 +10,23 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([adminGetStatistics(), adminGetVendors(), adminGetReviews()])
-      .then(([statsRes, vendorsRes, reviewsRes]) => {
+    Promise.all([adminGetStatistics(), adminGetRemitters(), adminGetReviews()])
+      .then(([statsRes, remittersRes, reviewsRes]) => {
         setStats(statsRes.data.statistics);
-        const pendingVendors = vendorsRes.data.vendors.filter(
-          (v: Vendor) => v.status === 'pending'
+        const pendingRemitters = remittersRes.data.remitters.filter(
+          (v: Remitter) => v.status === 'pending'
         ).length;
         const unapprovedReviews = reviewsRes.data.reviews.filter(
           (r: Review) => !r.isApproved
         ).length;
-        setPending(pendingVendors + unapprovedReviews);
+        setPending(pendingRemitters + unapprovedReviews);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
   const cards = [
-    { label: 'Total Vendors', value: stats?.vendors ?? '—', icon: Building2, color: 'bg-blue-500', to: '/admin/vendors' },
+    { label: 'Total Remitters', value: stats?.remitters ?? '—', icon: Building2, color: 'bg-blue-500', to: '/admin/remitters' },
     { label: 'Total Users', value: stats?.users ?? '—', icon: Users, color: 'bg-purple-500', to: '/admin/users' },
     { label: 'Banks Tracked', value: stats?.banks ?? '—', icon: BarChart2, color: 'bg-yellow-500', to: '/admin' },
     { label: 'Items Pending', value: pending, icon: MessageSquare, color: 'bg-red-500', to: '/admin/reviews' },
@@ -63,9 +63,9 @@ export default function AdminDashboard() {
       )}
 
       <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Link to="/admin/vendors" className="block bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
-          <h2 className="font-semibold text-gray-900 mb-1">Vendor Approvals</h2>
-          <p className="text-sm text-gray-500">Approve or reject vendor registrations.</p>
+        <Link to="/admin/remitters" className="block bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
+          <h2 className="font-semibold text-gray-900 mb-1">Remitter Approvals</h2>
+          <p className="text-sm text-gray-500">Approve or reject remitter registrations.</p>
         </Link>
         <Link to="/admin/users" className="block bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
           <h2 className="font-semibold text-gray-900 mb-1">User Management</h2>

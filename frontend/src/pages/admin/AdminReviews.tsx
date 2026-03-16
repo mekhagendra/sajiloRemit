@@ -67,7 +67,7 @@ export default function AdminReviews() {
                     </span>
                     <span className="text-xs text-gray-400">→</span>
                     <span className="text-sm text-gray-600">
-                      {typeof review.vendorId === 'object' ? review.vendorId.companyName : review.vendorId}
+                      {typeof review.remitterId === 'object' ? review.remitterId.companyName : review.remitterId}
                     </span>
                     <div className="flex items-center space-x-0.5">
                       {[...Array(5)].map((_, i) => (

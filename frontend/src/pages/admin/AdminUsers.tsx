@@ -59,7 +59,7 @@ export default function AdminUsers() {
                       className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
                         user.role === 'admin'
                           ? 'bg-purple-100 text-purple-700'
-                          : user.role === 'vendor'
+                          : user.role === 'remitter'
                           ? 'bg-blue-100 text-blue-700'
                           : 'bg-gray-100 text-gray-600'
                       }`}

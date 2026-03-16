@@ -45,7 +45,7 @@ export default function AdminBanners() {
   const [showGallery, setShowGallery] = useState(false);
 
   // Derive the API base (strip /api suffix) for building absolute image URLs
-  const apiBase = (import.meta.env.VITE_API_URL as string || 'http://localhost:5003/api').replace(/\/api$/, '');
+  const apiBase = (import.meta.env.VITE_API_URL as string || 'http://localhost:5000/api').replace(/\/api$/, '');
 
   const load = async () => {
     try {

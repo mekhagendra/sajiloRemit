@@ -1,37 +1,37 @@
 import { Request, Response } from 'express';
 import RemittanceRate from '../models/RemittanceRate';
-import Vendor from '../models/Vendor';
+import Remitter from '../models/Remitter';
 import Country from '../models/Country';
 import DailyRateSnapshot from '../models/DailyRateSnapshot';
 import { AuthRequest } from '../middleware/auth';
-import { VendorStatus } from '../types/enums';
+import { RemitterStatus } from '../types/enums';
 
 /**
  * GET /api/exchange-chart
  * Returns the current exchange-rate matrix:
  *   - countries: all active countries (excluding NPR destination)
- *   - vendors: approved vendors
- *   - rates: { [vendorId]: { [currency]: { rate, unit, fee, rateId } } }
+ *   - remitters: approved remitters
+ *   - rates: { [remitterId]: { [currency]: { rate, unit, fee, rateId } } }
  */
 export const getExchangeChart = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const [countries, vendors] = await Promise.all([
+    const [countries, remitters] = await Promise.all([
       Country.find({ isActive: true, currency: { $ne: 'NPR' } }).sort({ priority: 1, name: 1 }),
-      Vendor.find({ status: VendorStatus.APPROVED }).select('_id companyName logo').sort({ companyName: 1 }),
+      Remitter.find({ status: RemitterStatus.APPROVED }).select('_id companyName logo').sort({ companyName: 1 }),
     ]);
 
-    const vendorIds = vendors.map((v) => v._id);
+    const remitterIds = remitters.map((v) => v._id);
     const allRates = await RemittanceRate.find({
-      vendorId: { $in: vendorIds },
+      remitterId: { $in: remitterIds },
       toCurrency: 'NPR',
     });
 
-    // Build matrix: { vendorId -> { currency -> rateInfo } }
+    // Build matrix: { remitterId -> { currency -> rateInfo } }
     const matrix: Record<string, Record<string, { rate: number; unit: number; fee: number; rateId: string }>> = {};
     for (const r of allRates) {
-      const vid = r.vendorId.toString();
-      if (!matrix[vid]) matrix[vid] = {};
-      matrix[vid][r.fromCurrency] = {
+      const rid = r.remitterId.toString();
+      if (!matrix[rid]) matrix[rid] = {};
+      matrix[rid][r.fromCurrency] = {
         rate: r.rate,
         unit: r.unit,
         fee: r.fee,
@@ -39,7 +39,7 @@ export const getExchangeChart = async (_req: Request, res: Response): Promise<vo
       };
     }
 
-    res.json({ countries, vendors, matrix });
+    res.json({ countries, remitters, matrix });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -48,26 +48,26 @@ export const getExchangeChart = async (_req: Request, res: Response): Promise<vo
 /**
  * PUT /api/exchange-chart/rate
  * Admin updates a single cell in the chart.
- * Body: { vendorId, fromCurrency, toCurrency, rate, unit?, fee? }
+ * Body: { remitterId, fromCurrency, toCurrency, rate, unit?, fee? }
  * Upserts the RemittanceRate and returns the updated entry.
  */
 export const updateChartRate = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { vendorId, fromCurrency, toCurrency, rate, unit, fee } = req.body;
+    const { remitterId, fromCurrency, toCurrency, rate, unit, fee } = req.body;
 
-    if (!vendorId || !fromCurrency || !toCurrency || rate === undefined) {
-      res.status(400).json({ message: 'vendorId, fromCurrency, toCurrency and rate are required' });
+    if (!remitterId || !fromCurrency || !toCurrency || rate === undefined) {
+      res.status(400).json({ message: 'remitterId, fromCurrency, toCurrency and rate are required' });
       return;
     }
 
-    const vendor = await Vendor.findById(vendorId);
-    if (!vendor || vendor.status !== VendorStatus.APPROVED) {
-      res.status(404).json({ message: 'Approved vendor not found' });
+    const remitter = await Remitter.findById(remitterId);
+    if (!remitter || remitter.status !== RemitterStatus.APPROVED) {
+      res.status(404).json({ message: 'Approved remitter not found' });
       return;
     }
 
     const updated = await RemittanceRate.findOneAndUpdate(
-      { vendorId: vendor._id, fromCurrency: fromCurrency.toUpperCase(), toCurrency: toCurrency.toUpperCase() },
+      { remitterId: remitter._id, fromCurrency: fromCurrency.toUpperCase(), toCurrency: toCurrency.toUpperCase() },
       { rate, unit: unit || 1, fee: fee || 0 },
       { new: true, upsert: true }
     );
@@ -95,13 +95,13 @@ export const takeDailySnapshot = async (_req: Request, res: Response): Promise<v
   try {
     const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
-    const approvedVendors = await Vendor.find({ status: VendorStatus.APPROVED }).select('_id');
-    const vendorIds = approvedVendors.map((v) => v._id);
+    const approvedRemitters = await Remitter.find({ status: RemitterStatus.APPROVED }).select('_id');
+    const remitterIds = approvedRemitters.map((v) => v._id);
 
-    const allRates = await RemittanceRate.find({ vendorId: { $in: vendorIds } });
+    const allRates = await RemittanceRate.find({ remitterId: { $in: remitterIds } });
 
     const rateEntries = allRates.map((r) => ({
-      vendorId: r.vendorId,
+      remitterId: r.remitterId,
       fromCurrency: r.fromCurrency,
       toCurrency: r.toCurrency,
       rate: r.rate,
@@ -160,16 +160,16 @@ export const getSnapshotByDate = async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    // Gather unique vendor IDs and currencies from snapshot
-    const vendorIdSet = new Set<string>();
+    // Gather unique remitter IDs and currencies from snapshot
+    const remitterIdSet = new Set<string>();
     const currencySet = new Set<string>();
     for (const r of snapshot.rates) {
-      vendorIdSet.add(r.vendorId.toString());
+      remitterIdSet.add(r.remitterId.toString());
       if (r.toCurrency === 'NPR') currencySet.add(r.fromCurrency);
     }
 
-    const [vendors, countries] = await Promise.all([
-      Vendor.find({ _id: { $in: Array.from(vendorIdSet) } }).select('_id companyName logo').sort({ companyName: 1 }),
+    const [remitters, countries] = await Promise.all([
+      Remitter.find({ _id: { $in: Array.from(remitterIdSet) } }).select('_id companyName logo').sort({ companyName: 1 }),
       Country.find({ currency: { $in: Array.from(currencySet) }, isActive: true }).sort({ priority: 1, name: 1 }),
     ]);
 
@@ -177,12 +177,12 @@ export const getSnapshotByDate = async (req: Request, res: Response): Promise<vo
     const matrix: Record<string, Record<string, { rate: number; unit: number; fee: number }>> = {};
     for (const r of snapshot.rates) {
       if (r.toCurrency !== 'NPR') continue;
-      const vid = r.vendorId.toString();
-      if (!matrix[vid]) matrix[vid] = {};
-      matrix[vid][r.fromCurrency] = { rate: r.rate, unit: r.unit, fee: r.fee };
+      const rid = r.remitterId.toString();
+      if (!matrix[rid]) matrix[rid] = {};
+      matrix[rid][r.fromCurrency] = { rate: r.rate, unit: r.unit, fee: r.fee };
     }
 
-    res.json({ date: snapshot.date, countries, vendors, matrix });
+    res.json({ date: snapshot.date, countries, remitters, matrix });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }

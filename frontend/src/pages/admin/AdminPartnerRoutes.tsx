@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, ArrowLeftRight, Star } from 'lucide-react';
 import {
   adminGetCountries,
-  adminGetVendors,
+  adminGetRemitters,
   adminGetPartnerRoutes,
   adminCreatePartnerRoute,
   adminUpdatePartnerRoute,
   adminDeletePartnerRoute,
 } from '../../api';
-import type { Country, Vendor, PartnerRoute, Partner } from '../../types';
+import type { Country, Remitter, PartnerRoute, Partner } from '../../types';
 
 interface RouteForm {
   sendCountry: string;
@@ -17,7 +17,7 @@ interface RouteForm {
   // partner fields
   description: string;
   featured: boolean;
-  vendorId: string;
+  remitterId: string;
 }
 
 const EMPTY: RouteForm = {
@@ -26,7 +26,7 @@ const EMPTY: RouteForm = {
   isActive: true,
   description: '',
   featured: false,
-  vendorId: '',
+  remitterId: '',
 };
 
 function getCountry(val: Country | string, list: Country[]): Country | undefined {
@@ -42,7 +42,7 @@ function getPartnerObj(val: Partner | string | undefined): Partner | undefined {
 export default function AdminPartnerRoutes() {
   const [routes, setRoutes] = useState<PartnerRoute[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
-  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [remitters, setRemitters] = useState<Remitter[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -52,14 +52,14 @@ export default function AdminPartnerRoutes() {
 
   const load = async () => {
     try {
-      const [routesRes, countriesRes, vendorsRes] = await Promise.all([
+      const [routesRes, countriesRes, remittersRes] = await Promise.all([
         adminGetPartnerRoutes(),
         adminGetCountries(),
-        adminGetVendors(),
+        adminGetRemitters(),
       ]);
       setRoutes(routesRes.data.routes);
       setCountries(countriesRes.data.countries);
-      setVendors(vendorsRes.data.vendors.filter(v => v.status === 'approved'));
+      setRemitters(remittersRes.data.remitters.filter(v => v.status === 'approved'));
     } catch {
       setError('Failed to load data');
     } finally {
@@ -81,7 +81,7 @@ export default function AdminPartnerRoutes() {
       isActive: r.isActive,
       description: p?.description ?? '',
       featured: p?.featured ?? false,
-      vendorId: p?.vendorId ?? '',
+      remitterId: p?.remitterId ?? '',
     });
     setShowForm(true);
   };
@@ -133,7 +133,7 @@ export default function AdminPartnerRoutes() {
       </div>
 
       <p className="text-sm text-gray-500 mb-6">
-        Assign one partner per <span className="font-medium text-gray-700">Send Country → Receive Country</span> corridor. The linked vendor's rates are pinned first in search results.
+        Assign one partner per <span className="font-medium text-gray-700">Send Country → Receive Country</span> corridor. The linked remitter's rates are pinned first in search results.
       </p>
 
       {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>}
@@ -176,10 +176,10 @@ export default function AdminPartnerRoutes() {
             {/* Partner details */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Partner <span className="text-gray-400">(pins their rates first)</span></label>
-              <select value={form.vendorId} onChange={e => setForm(f => ({ ...f, vendorId: e.target.value }))}
+              <select value={form.remitterId} onChange={e => setForm(f => ({ ...f, remitterId: e.target.value }))}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
-                <option value="">— No linked vendor —</option>
-                {vendors.map(v => (
+                <option value="">— No linked Remitters —</option>
+                {remitters.map(v => (
                   <option key={v._id} value={v._id}>{v.companyName}</option>
                 ))}
               </select>
@@ -229,7 +229,7 @@ export default function AdminPartnerRoutes() {
                 <tr>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Corridor</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Partner</th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600">Linked Vendor</th>
+                  <th className="text-left px-4 py-3 font-semibold text-gray-600">Linked Remitter</th>
                   <th className="text-center px-4 py-3 font-semibold text-gray-600">Featured</th>
                   <th className="text-center px-4 py-3 font-semibold text-gray-600">Status</th>
                   <th className="text-right px-4 py-3 font-semibold text-gray-600">Actions</th>
@@ -240,7 +240,7 @@ export default function AdminPartnerRoutes() {
                   const send = getCountry(r.sendCountry, countries);
                   const receive = getCountry(r.receiveCountry, countries);
                   const partner = getPartnerObj(r.partner);
-                  const linkedVendor = vendors.find(v => v._id === partner?.vendorId);
+                  const linkedRemitter = remitters.find(v => v._id === partner?.remitterId);
                   return (
                     <tr key={r._id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
@@ -272,7 +272,7 @@ export default function AdminPartnerRoutes() {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-gray-700 text-sm">
-                        {linkedVendor ? linkedVendor.companyName : <span className="text-gray-400">—</span>}
+                        {linkedRemitter ? linkedRemitter.companyName : <span className="text-gray-400">—</span>}
                       </td>
                       <td className="px-4 py-3 text-center">
                         {partner?.featured

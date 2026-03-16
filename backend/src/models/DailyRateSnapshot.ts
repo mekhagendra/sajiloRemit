@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IRateEntry {
-  vendorId: mongoose.Types.ObjectId;
+  remitterId: mongoose.Types.ObjectId;
   fromCurrency: string;
   toCurrency: string;
   rate: number;
@@ -17,7 +17,7 @@ export interface IDailyRateSnapshot extends Document {
 
 const rateEntrySchema = new Schema<IRateEntry>(
   {
-    vendorId: { type: Schema.Types.ObjectId, ref: 'Vendor', required: true },
+    remitterId: { type: Schema.Types.ObjectId, ref: 'Remitter', required: true },
     fromCurrency: { type: String, required: true, uppercase: true, trim: true },
     toCurrency: { type: String, required: true, uppercase: true, trim: true },
     rate: { type: Number, required: true },

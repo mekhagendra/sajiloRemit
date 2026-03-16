@@ -31,8 +31,8 @@ export const adminGetPartners = async (_req: Request, res: Response): Promise<vo
 
 export const createPartner = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { name, sendCountry, receiveCountry, logoUrl, website, description, isActive, featured, vendorId } = req.body;
-    const created = await Partner.create({ name, sendCountry, receiveCountry, logoUrl, website, description, isActive, featured: featured ?? false, vendorId: vendorId || null });
+    const { name, sendCountry, receiveCountry, logoUrl, website, description, isActive, featured, remitterId } = req.body;
+    const created = await Partner.create({ name, sendCountry, receiveCountry, logoUrl, website, description, isActive, featured: featured ?? false, remitterId: remitterId || null });
     const partner = await created.populate(POPULATE);
     res.status(201).json({ partner });
   } catch (error: unknown) {
@@ -46,10 +46,10 @@ export const createPartner = async (req: AuthRequest, res: Response): Promise<vo
 
 export const updatePartner = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { name, sendCountry, receiveCountry, logoUrl, website, description, isActive, featured, vendorId } = req.body;
+    const { name, sendCountry, receiveCountry, logoUrl, website, description, isActive, featured, remitterId } = req.body;
     const partner = await Partner.findByIdAndUpdate(
       req.params.id,
-      { name, sendCountry, receiveCountry, logoUrl, website, description, isActive, featured: featured ?? false, vendorId: vendorId || null },
+      { name, sendCountry, receiveCountry, logoUrl, website, description, isActive, featured: featured ?? false, remitterId: remitterId || null },
       { new: true, runValidators: true }
     ).populate(POPULATE);
     if (!partner) {

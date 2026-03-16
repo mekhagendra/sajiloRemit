@@ -1,45 +1,45 @@
 import { Request, Response } from 'express';
 import crypto from 'crypto';
 import User from '../models/User';
-import Vendor from '../models/Vendor';
+import Remitter from '../models/Remitter';
 import Review from '../models/Review';
 import Blog from '../models/Blog';
 import RemittanceRate from '../models/RemittanceRate';
 import BankInterestRate from '../models/BankInterestRate';
 import { AuthRequest } from '../middleware/auth';
-import { VendorStatus, UserStatus, UserRole } from '../types/enums';
+import { RemitterStatus, UserStatus, UserRole } from '../types/enums';
 
-// Vendor management
-export const getAllVendors = async (_req: Request, res: Response): Promise<void> => {
+// Remitter management
+export const getAllRemitters = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const vendors = await Vendor.find().populate('userId', 'name email');
-    res.json({ vendors });
+    const remitters = await Remitter.find().populate('userId', 'name email');
+    res.json({ remitters });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-export const updateVendorStatus = async (req: AuthRequest, res: Response): Promise<void> => {
+export const updateRemitterStatus = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { status } = req.body;
-    if (!Object.values(VendorStatus).includes(status)) {
+    if (!Object.values(RemitterStatus).includes(status)) {
       res.status(400).json({ message: 'Invalid status' });
       return;
     }
 
-    const vendor = await Vendor.findByIdAndUpdate(req.params.id, { status }, { new: true });
-    if (!vendor) {
-      res.status(404).json({ message: 'Vendor not found' });
+    const remitter = await Remitter.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    if (!remitter) {
+      res.status(404).json({ message: 'Remitter not found' });
       return;
     }
 
-    res.json({ vendor });
+    res.json({ remitter });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-export const adminCreateAgent = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminCreateRemitter = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { name, email, password, companyName, baseCountry, supportedCountries, phone, website, description, logo } = req.body;
 
@@ -56,10 +56,10 @@ export const adminCreateAgent = async (req: AuthRequest, res: Response): Promise
 
     const tempPassword = password || crypto.randomBytes(8).toString('hex');
 
-    const user = new User({ name, email, password: tempPassword, role: UserRole.VENDOR, status: UserStatus.ACTIVE });
+    const user = new User({ name, email, password: tempPassword, role: UserRole.REMITTER, status: UserStatus.ACTIVE });
     await user.save();
 
-    const vendor = new Vendor({
+    const remitter = new Remitter({
       userId: user._id,
       companyName,
       baseCountry: baseCountry || '',
@@ -69,35 +69,35 @@ export const adminCreateAgent = async (req: AuthRequest, res: Response): Promise
       website: website || '',
       description: description || '',
       logo: logo || '',
-      status: VendorStatus.APPROVED,
+      status: RemitterStatus.APPROVED,
     });
-    await vendor.save();
+    await remitter.save();
 
-    res.status(201).json({ vendor, tempPassword: password ? undefined : tempPassword });
+    res.status(201).json({ remitter, tempPassword: password ? undefined : tempPassword });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-export const adminGetVendorRates = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminGetRemitterRates = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const vendor = await Vendor.findById(req.params.id);
-    if (!vendor) {
-      res.status(404).json({ message: 'Vendor not found' });
+    const remitter = await Remitter.findById(req.params.id);
+    if (!remitter) {
+      res.status(404).json({ message: 'Remitter not found' });
       return;
     }
-    const rates = await RemittanceRate.find({ vendorId: vendor._id }).sort({ fromCurrency: 1, toCurrency: 1 });
+    const rates = await RemittanceRate.find({ remitterId: remitter._id }).sort({ fromCurrency: 1, toCurrency: 1 });
     res.json({ rates });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-export const adminCreateRateForVendor = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminCreateRateForRemitter = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const vendor = await Vendor.findById(req.params.id);
-    if (!vendor) {
-      res.status(404).json({ message: 'Vendor not found' });
+    const remitter = await Remitter.findById(req.params.id);
+    if (!remitter) {
+      res.status(404).json({ message: 'Remitter not found' });
       return;
     }
 
@@ -108,7 +108,7 @@ export const adminCreateRateForVendor = async (req: AuthRequest, res: Response):
     }
 
     const existingRate = await RemittanceRate.findOneAndUpdate(
-      { vendorId: vendor._id, fromCurrency: fromCurrency.toUpperCase(), toCurrency: toCurrency.toUpperCase() },
+      { remitterId: remitter._id, fromCurrency: fromCurrency.toUpperCase(), toCurrency: toCurrency.toUpperCase() },
       { rate, unit: unit || 1, fee: fee || 0 },
       { new: true, upsert: true }
     );
@@ -119,11 +119,11 @@ export const adminCreateRateForVendor = async (req: AuthRequest, res: Response):
   }
 };
 
-export const adminUpdateRateForVendor = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminUpdateRateForRemitter = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { rate, unit, fee } = req.body;
     const existingRate = await RemittanceRate.findOneAndUpdate(
-      { _id: req.params.rateId, vendorId: req.params.id },
+      { _id: req.params.rateId, remitterId: req.params.id },
       { rate, unit, fee },
       { new: true }
     );
@@ -137,9 +137,9 @@ export const adminUpdateRateForVendor = async (req: AuthRequest, res: Response):
   }
 };
 
-export const adminDeleteRateForVendor = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminDeleteRateForRemitter = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const deleted = await RemittanceRate.findOneAndDelete({ _id: req.params.rateId, vendorId: req.params.id });
+    const deleted = await RemittanceRate.findOneAndDelete({ _id: req.params.rateId, remitterId: req.params.id });
     if (!deleted) {
       res.status(404).json({ message: 'Rate not found' });
       return;
@@ -150,23 +150,23 @@ export const adminDeleteRateForVendor = async (req: AuthRequest, res: Response):
   }
 };
 
-export const adminToggleVendorCountry = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminToggleRemitterCountry = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const vendor = await Vendor.findById(req.params.id);
-    if (!vendor) {
-      res.status(404).json({ message: 'Vendor not found' });
+    const remitter = await Remitter.findById(req.params.id);
+    if (!remitter) {
+      res.status(404).json({ message: 'Remitter not found' });
       return;
     }
 
-    const entry = vendor.supportedCountries.find((c) => c.countryCode === (req.params.code as string).toUpperCase());
+    const entry = remitter.supportedCountries.find((c) => c.countryCode === (req.params.code as string).toUpperCase());
     if (!entry) {
-      res.status(404).json({ message: 'Country not found on this vendor' });
+      res.status(404).json({ message: 'Country not found on this remitter' });
       return;
     }
 
     entry.isActive = req.body.isActive ?? !entry.isActive;
-    await vendor.save();
-    res.json({ vendor });
+    await remitter.save();
+    res.json({ remitter });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -214,7 +214,7 @@ export const getAllReviews = async (_req: Request, res: Response): Promise<void>
   try {
     const reviews = await Review.find()
       .populate('userId', 'name email')
-      .populate('vendorId', 'companyName')
+      .populate('remitterId', 'companyName')
       .sort({ createdAt: -1 });
     res.json({ reviews });
   } catch (error) {
@@ -261,11 +261,84 @@ export const getAllBlogs = async (_req: Request, res: Response): Promise<void> =
   }
 };
 
+// Editor management
+export const getAllEditors = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const editors = await User.find({ role: UserRole.EDITOR }).select('-password');
+    res.json({ editors });
+  } catch {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const createEditor = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      res.status(400).json({ message: 'name, email and password are required' });
+      return;
+    }
+    if (password.length < 6) {
+      res.status(400).json({ message: 'Password must be at least 6 characters' });
+      return;
+    }
+    const existing = await User.findOne({ email });
+    if (existing) {
+      res.status(409).json({ message: 'Email already in use' });
+      return;
+    }
+    const editor = new User({ name, email, password, role: UserRole.EDITOR, status: UserStatus.ACTIVE });
+    await editor.save();
+    res.status(201).json({ editor });
+  } catch {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const updateEditor = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { name, password, status } = req.body;
+    const editor = await User.findOne({ _id: req.params.id, role: UserRole.EDITOR });
+    if (!editor) {
+      res.status(404).json({ message: 'Editor not found' });
+      return;
+    }
+    if (name) editor.name = name;
+    if (status && Object.values(UserStatus).includes(status)) editor.status = status;
+    if (password) {
+      if (password.length < 6) {
+        res.status(400).json({ message: 'Password must be at least 6 characters' });
+        return;
+      }
+      editor.password = password;
+    }
+    await editor.save();
+    const { password: _pw, ...safe } = editor.toJSON() as any;
+    void _pw;
+    res.json({ editor: safe });
+  } catch {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const deleteEditor = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const editor = await User.findOneAndDelete({ _id: req.params.id, role: UserRole.EDITOR });
+    if (!editor) {
+      res.status(404).json({ message: 'Editor not found' });
+      return;
+    }
+    res.json({ message: 'Editor deleted' });
+  } catch {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // Statistics
 export const getStatistics = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const [vendorCount, userCount, bankCount, countryResult] = await Promise.all([
-      Vendor.countDocuments({ status: VendorStatus.APPROVED }),
+    const [remitterCount, userCount, bankCount, countryResult] = await Promise.all([
+      Remitter.countDocuments({ status: RemitterStatus.APPROVED }),
       User.countDocuments(),
       BankInterestRate.distinct('bankName').then((names) => names.length),
       RemittanceRate.distinct('fromCurrency'),
@@ -274,7 +347,7 @@ export const getStatistics = async (_req: Request, res: Response): Promise<void>
     res.json({
       statistics: {
         countries: countryResult.length,
-        vendors: vendorCount,
+        remitters: remitterCount,
         banks: bankCount,
         users: userCount,
       },

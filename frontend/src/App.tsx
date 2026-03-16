@@ -6,17 +6,17 @@ import ProtectedRoute from './components/admin/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import BestRatesPage from './pages/BestRatesPage';
 import ForexPage from './pages/ForexPage';
-import AgentsPage from './pages/AgentsPage';
+import RemittersPage from './pages/RemittersPage';
 import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import BankRatesPage from './pages/BankRatesPage';
 import BlogsPage from './pages/BlogsPage';
 import BlogDetailPage from './pages/BlogDetailPage';
-import VendorRegisterPage from './pages/VendorRegisterPage';
-import VendorDashboard from './pages/VendorDashboard';
+import RemitterRegisterPage from './pages/RemitterRegisterPage';
+import RemitterDashboard from './pages/RemitterDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminVendors from './pages/admin/AdminVendors';
+import AdminRemitters from './pages/admin/AdminRemitters';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminReviews from './pages/admin/AdminReviews';
 import AdminBankRates from './pages/admin/AdminBankRates';
@@ -27,6 +27,8 @@ import AdminCountries from './pages/admin/AdminCountries';
 import AdminPartnerRoutes from './pages/admin/AdminPartnerRoutes';
 import AdminExchangeChart from './pages/admin/AdminExchangeChart';
 import AdminGallery from './pages/admin/AdminGallery';
+import EditorProfile from './pages/admin/EditorProfile';
+import AdminEditors from './pages/admin/AdminEditors';
 
 export default function App() {
   return (
@@ -37,15 +39,16 @@ export default function App() {
             <Route index element={<HomePage />} />
             <Route path="best-rates" element={<BestRatesPage />} />
             <Route path="forex" element={<ForexPage />} />
-            <Route path="agents" element={<AgentsPage />} />
+            <Route path="remitters" element={<RemittersPage />} />
             <Route path="contact" element={<ContactPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="bank-rates" element={<BankRatesPage />} />
             <Route path="blogs" element={<BlogsPage />} />
             <Route path="blogs/:id" element={<BlogDetailPage />} />
-            <Route path="join-us" element={<VendorRegisterPage />} />
-            <Route path="vendor/dashboard" element={<VendorDashboard />} />
+            <Route path="join-us" element={<RemitterRegisterPage />} />
+            <Route path="remitter/dashboard" element={<RemitterDashboard />} />
+            <Route path="profile" element={<EditorProfile />} />
           </Route>
 
           <Route
@@ -57,7 +60,7 @@ export default function App() {
             }
           >
             <Route index element={<AdminDashboard />} />
-            <Route path="vendors" element={<AdminVendors />} />
+            <Route path="remitters" element={<AdminRemitters />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="reviews" element={<AdminReviews />} />
             <Route path="banks" element={<AdminBanks />} />
@@ -68,6 +71,8 @@ export default function App() {
             <Route path="partner-routes" element={<AdminPartnerRoutes />} />
             <Route path="exchange-chart" element={<AdminExchangeChart />} />
             <Route path="gallery" element={<AdminGallery />} />
+            <Route path="profile" element={<EditorProfile />} />
+            <Route path="editors" element={<AdminEditors />} />
           </Route>
         </Routes>
       </BrowserRouter>

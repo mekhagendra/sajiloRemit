@@ -14,7 +14,7 @@ export default function StatisticsSection() {
 
   const items = [
     { icon: Globe, label: 'Countries', value: stats?.countries ?? 0, color: 'bg-blue-100 text-blue-600' },
-    { icon: Building, label: 'Agents', value: stats?.vendors ?? 0, color: 'bg-green-100 text-green-600' },
+    { icon: Building, label: 'Agents', value: stats?.remitters ?? 0, color: 'bg-green-100 text-green-600' },
     { icon: Landmark, label: 'Banks', value: stats?.banks ?? 0, color: 'bg-purple-100 text-purple-600' },
     { icon: Users, label: 'Users', value: stats?.users ?? 0, color: 'bg-orange-100 text-orange-600' },
   ];

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import type { Blog } from '../types';
 import { BookOpen } from 'lucide-react';
 
-const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5003/api').replace(/\/api$/, '');
+const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5000/api').replace(/\/api$/, '');
 const resolveUrl = (url: string) => (url?.startsWith('/') ? `${API_BASE}${url}` : url);
 
 export default function BlogsPage() {

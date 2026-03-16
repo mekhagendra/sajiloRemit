@@ -8,7 +8,7 @@ import type {
   Blog,
   Review,
   User,
-  Vendor,
+  Remitter,
   Statistics,
   ForexRates,
   Banner,
@@ -30,8 +30,14 @@ export const loginUser = (data: { email: string; password: string }) =>
 
 export const getMe = () => api.get<{ user: AuthResponse['user'] }>('/auth/me');
 
-export const toggleFavoriteVendor = (vendorId: string) =>
-  api.post<{ favoriteVendors: string[] }>(`/auth/favorites/${vendorId}`);
+export const updateProfile = (data: { name: string }) =>
+  api.put<{ user: User }>('/auth/profile', data);
+
+export const changePassword = (data: { currentPassword: string; newPassword: string }) =>
+  api.put<{ message: string }>('/auth/password', data);
+
+export const toggleFavoriteRemitter = (remitterId: string) =>
+  api.post<{ favoriteRemitters: string[] }>(`/auth/favorites/${remitterId}`);
 
 // Rates
 export const searchRates = (params: { fromCurrency?: string; toCurrency?: string; amount?: number }) =>
@@ -39,25 +45,25 @@ export const searchRates = (params: { fromCurrency?: string; toCurrency?: string
 
 export const getBestRates = () => api.get<{ rates: BestRate[] }>('/rates/best');
 
-// Vendors
-export const getVendors = (params?: { country?: string }) =>
-  api.get<{ vendors: Vendor[] }>('/vendors', { params });
+// Remitters
+export const getRemitters = (params?: { country?: string }) =>
+  api.get<{ remitters: Remitter[] }>('/remitters', { params });
 
-export const getVendorById = (id: string) => api.get<{ vendor: Vendor }>(`/vendors/${id}`);
+export const getRemitterById = (id: string) => api.get<{ remitter: Remitter }>(`/remitters/${id}`);
 
-export const registerVendor = (data: Partial<Vendor>) => api.post<{ vendor: Vendor }>('/vendors', data);
+export const registerRemitter = (data: Partial<Remitter>) => api.post<{ remitter: Remitter }>('/remitters', data);
 
-export const getMyVendorProfile = () => api.get<{ vendor: Vendor }>('/vendors/me');
-export const updateMyVendorProfile = (data: Partial<Vendor>) => api.put<{ vendor: Vendor }>('/vendors', data);
-export const getMyRates = () => api.get<{ rates: RemittanceRate[] }>('/rates/vendor');
+export const getMyRemitterProfile = () => api.get<{ remitter: Remitter }>('/remitters/me');
+export const updateMyRemitterProfile = (data: Partial<Remitter>) => api.put<{ remitter: Remitter }>('/remitters', data);
+export const getMyRates = () => api.get<{ rates: RemittanceRate[] }>('/rates/remitter');
 export const addRate = (data: { fromCurrency: string; toCurrency: string; rate: number; unit?: number; fee?: number }) =>
   api.post<{ rate: RemittanceRate }>('/rates', data);
 export const updateRate = (id: string, data: { rate: number; unit?: number; fee?: number }) =>
   api.put<{ rate: RemittanceRate }>(`/rates/${id}`, data);
 export const deleteRate = (id: string) => api.delete(`/rates/${id}`);
-export const upsertVendorCountry = (data: { countryCode: string; canSend: boolean; canReceive: boolean }) =>
-  api.put<{ vendor: Vendor }>('/vendors/countries/upsert', data);
-export const removeVendorCountry = (code: string) => api.delete<{ vendor: Vendor }>(`/vendors/countries/${code}`);
+export const upsertRemitterCountry = (data: { countryCode: string; canSend: boolean; canReceive: boolean }) =>
+  api.put<{ remitter: Remitter }>('/remitters/countries/upsert', data);
+export const removeRemitterCountry = (code: string) => api.delete<{ remitter: Remitter }>(`/remitters/countries/${code}`);
 
 // Bank Rates
 export const getBankRates = (params?: { page?: number; limit?: number }) =>
@@ -75,10 +81,10 @@ export const getBlogById = (id: string) => api.get<{ blog: Blog }>(`/blogs/${id}
 // Reviews
 export const getLatestReviews = () => api.get<{ reviews: Review[] }>('/reviews/latest');
 
-export const getVendorReviews = (vendorId: string) =>
-  api.get<{ reviews: Review[] }>(`/reviews/vendor/${vendorId}`);
+export const getRemitterReviews = (remitterId: string) =>
+  api.get<{ reviews: Review[] }>(`/reviews/remitter/${remitterId}`);
 
-export const createReview = (data: { vendorId: string; rating: number; text: string }) =>
+export const createReview = (data: { remitterId: string; rating: number; text: string }) =>
   api.post<{ review: Review }>('/reviews', data);
 
 // Statistics
@@ -127,27 +133,35 @@ export const adminUpdateBank = (id: string, data: { name?: string; logoUrl?: str
 export const adminDeleteBank = (id: string) => api.delete(`/banks/${id}`);
 
 // Admin
-export const adminGetVendors = () => api.get<{ vendors: Vendor[] }>('/admin/vendors');
-export const adminUpdateVendorStatus = (id: string, status: string) =>
-  api.put(`/admin/vendors/${id}/status`, { status });
-export const adminCreateAgent = (data: {
+export const adminGetRemitters = () => api.get<{ remitters: Remitter[] }>('/admin/remitters');
+export const adminUpdateRemitterStatus = (id: string, status: string) =>
+  api.put(`/admin/remitters/${id}/status`, { status });
+export const adminCreateRemitter = (data: {
   name: string; email: string; password?: string; companyName: string;
   baseCountry?: string; phone?: string; website?: string; description?: string; logo?: string;
-}) => api.post<{ vendor: Vendor; tempPassword?: string }>('/admin/vendors', data);
-export const adminGetVendorRates = (vendorId: string) =>
-  api.get<{ rates: RemittanceRate[] }>(`/admin/vendors/${vendorId}/rates`);
-export const adminCreateRateForVendor = (vendorId: string, data: { fromCurrency: string; toCurrency: string; rate: number; unit?: number; fee?: number }) =>
-  api.post<{ rate: RemittanceRate }>(`/admin/vendors/${vendorId}/rates`, data);
-export const adminUpdateRateForVendor = (vendorId: string, rateId: string, data: { rate?: number; unit?: number; fee?: number }) =>
-  api.put<{ rate: RemittanceRate }>(`/admin/vendors/${vendorId}/rates/${rateId}`, data);
-export const adminDeleteRateForVendor = (vendorId: string, rateId: string) =>
-  api.delete(`/admin/vendors/${vendorId}/rates/${rateId}`);
-export const adminToggleVendorCountry = (vendorId: string, code: string, isActive: boolean) =>
-  api.put<{ vendor: Vendor }>(`/admin/vendors/${vendorId}/countries/${code}`, { isActive });
+}) => api.post<{ remitter: Remitter; tempPassword?: string }>('/admin/remitters', data);
+export const adminGetRemitterRates = (remitterId: string) =>
+  api.get<{ rates: RemittanceRate[] }>(`/admin/remitters/${remitterId}/rates`);
+export const adminCreateRateForRemitter = (remitterId: string, data: { fromCurrency: string; toCurrency: string; rate: number; unit?: number; fee?: number }) =>
+  api.post<{ rate: RemittanceRate }>(`/admin/remitters/${remitterId}/rates`, data);
+export const adminUpdateRateForRemitter = (remitterId: string, rateId: string, data: { rate?: number; unit?: number; fee?: number }) =>
+  api.put<{ rate: RemittanceRate }>(`/admin/remitters/${remitterId}/rates/${rateId}`, data);
+export const adminDeleteRateForRemitter = (remitterId: string, rateId: string) =>
+  api.delete(`/admin/remitters/${remitterId}/rates/${rateId}`);
+export const adminToggleRemitterCountry = (remitterId: string, code: string, isActive: boolean) =>
+  api.put<{ remitter: Remitter }>(`/admin/remitters/${remitterId}/countries/${code}`, { isActive });
 
 export const adminGetUsers = () => api.get<{ users: User[] }>('/admin/users');
 export const adminUpdateUserStatus = (id: string, status: string, suspendReason?: string) =>
   api.put(`/admin/users/${id}/status`, { status, suspendReason });
+
+// Admin - Editors
+export const adminGetEditors = () => api.get<{ editors: User[] }>('/admin/editors');
+export const adminCreateEditor = (data: { name: string; email: string; password: string }) =>
+  api.post<{ editor: User }>('/admin/editors', data);
+export const adminUpdateEditor = (id: string, data: { name?: string; password?: string; status?: string }) =>
+  api.put<{ editor: User }>(`/admin/editors/${id}`, data);
+export const adminDeleteEditor = (id: string) => api.delete(`/admin/editors/${id}`);
 
 export const adminGetReviews = () => api.get<{ reviews: Review[] }>('/admin/reviews');
 export const adminModerateReview = (id: string, isApproved: boolean) =>
@@ -178,12 +192,12 @@ type PartnerRoutePayload = {
   sendCountry: string;
   receiveCountry: string;
   isActive: boolean;
-  name: string;
+  name?: string;
   logoUrl?: string;
   website?: string;
   description?: string;
   featured?: boolean;
-  vendorId?: string;
+  remitterId?: string;
 };
 export const adminGetPartnerRoutes = () => api.get<{ routes: PartnerRoute[] }>('/partner-routes/all');
 export const adminCreatePartnerRoute = (data: PartnerRoutePayload) =>
@@ -196,7 +210,7 @@ export const adminDeletePartnerRoute = (id: string) => api.delete(`/partner-rout
 export const adminGetExchangeChart = () =>
   api.get<ExchangeChartData>('/exchange-chart');
 export const adminUpdateChartRate = (data: {
-  vendorId: string; fromCurrency: string; toCurrency: string;
+  remitterId: string; fromCurrency: string; toCurrency: string;
   rate: number; unit?: number; fee?: number;
 }) => api.put<{ rate: RemittanceRate; cell: ExchangeChartCell }>('/exchange-chart/rate', data);
 export const adminTakeSnapshot = () =>

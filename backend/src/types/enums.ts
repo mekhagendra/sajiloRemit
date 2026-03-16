@@ -1,10 +1,11 @@
 export enum UserRole {
   USER = 'user',
-  VENDOR = 'vendor',
+  REMITTER = 'remitter',
+  EDITOR = 'editor',
   ADMIN = 'admin',
 }
 
-export enum VendorStatus {
+export enum RemitterStatus {
   PENDING = 'pending',
   APPROVED = 'approved',
   REJECTED = 'rejected',

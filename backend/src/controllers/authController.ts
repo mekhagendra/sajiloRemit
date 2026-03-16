@@ -69,20 +69,52 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<vo
   }
 };
 
-export const toggleFavoriteVendor = async (req: AuthRequest, res: Response): Promise<void> => {
+export const toggleFavoriteRemitter = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { vendorId } = req.params;
+    const { remitterId } = req.params;
     const user = req.user!;
 
-    const index = user.favoriteVendors.indexOf(vendorId as any);
+    const index = user.favoriteRemitters.indexOf(remitterId as any);
     if (index > -1) {
-      user.favoriteVendors.splice(index, 1);
+      user.favoriteRemitters.splice(index, 1);
     } else {
-      user.favoriteVendors.push(vendorId as any);
+      user.favoriteRemitters.push(remitterId as any);
     }
 
     await user.save();
-    res.json({ favoriteVendors: user.favoriteVendors });
+    res.json({ favoriteRemitters: user.favoriteRemitters });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const changePassword = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      res.status(400).json({ message: 'currentPassword and newPassword are required' });
+      return;
+    }
+    if (newPassword.length < 6) {
+      res.status(400).json({ message: 'New password must be at least 6 characters' });
+      return;
+    }
+
+    const user = await User.findById(req.user!._id).select('+password');
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      res.status(400).json({ message: 'Current password is incorrect' });
+      return;
+    }
+
+    user.password = newPassword;
+    await user.save();
+    res.json({ message: 'Password changed successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
