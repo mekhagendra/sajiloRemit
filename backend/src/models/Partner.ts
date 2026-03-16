@@ -16,7 +16,7 @@ export interface IPartner extends Document {
 
 const partnerSchema = new Schema<IPartner>(
   {
-    name: { type: String, required: true, trim: true },
+    name: { type: String, required: false, trim: true, default: '' },
     sendCountry: { type: Schema.Types.ObjectId, ref: 'Country', required: true },
     receiveCountry: { type: Schema.Types.ObjectId, ref: 'Country', required: true },
     logoUrl: { type: String, trim: true, default: '' },
@@ -29,7 +29,6 @@ const partnerSchema = new Schema<IPartner>(
   { timestamps: true }
 );
 
-// Same partner name cannot appear twice for the same corridor
-partnerSchema.index({ name: 1, sendCountry: 1, receiveCountry: 1 }, { unique: true });
+// Corridor-level uniqueness is enforced by PartnerRoute; no need for a duplicate index here
 
 export default mongoose.model<IPartner>('Partner', partnerSchema);

@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore – ckeditor5-react v5 ships no .d.ts files
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
@@ -13,7 +15,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
       <CKEditor
         editor={ClassicEditor as any}
         data={value}
-        onChange={(_event: any, editor: any) => {
+        onChange={(_event: unknown, editor: any) => {
           onChange(editor.getData());
         }}
         config={{

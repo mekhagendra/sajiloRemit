@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import PartnerRoute from '../models/PartnerRoute';
 import Partner from '../models/Partner';
+import Vendor from '../models/Vendor';
 import { AuthRequest } from '../middleware/auth';
 
 const POPULATE = [
@@ -33,15 +34,22 @@ export const adminGetPartnerRoutes = async (_req: Request, res: Response): Promi
 
 export const createPartnerRoute = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { sendCountry, receiveCountry, isActive, name, logoUrl, website, description, featured, vendorId } = req.body;
+    const { sendCountry, receiveCountry, isActive, description, featured, vendorId } = req.body;
+
+    // Derive partner name from the linked vendor, fallback to corridor placeholder
+    let derivedName = 'Partner';
+    if (vendorId) {
+      const vendor = await Vendor.findById(vendorId).select('companyName website logo');
+      if (vendor) derivedName = vendor.companyName;
+    }
 
     // Create partner record first
     const partner = await Partner.create({
-      name,
+      name: derivedName,
       sendCountry,
       receiveCountry,
-      logoUrl: logoUrl || '',
-      website: website || '',
+      logoUrl: '',
+      website: '',
       description: description || '',
       featured: featured ?? false,
       vendorId: vendorId || null,
@@ -62,7 +70,7 @@ export const createPartnerRoute = async (req: AuthRequest, res: Response): Promi
 
 export const updatePartnerRoute = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { sendCountry, receiveCountry, isActive, name, logoUrl, website, description, featured, vendorId } = req.body;
+    const { sendCountry, receiveCountry, isActive, description, featured, vendorId } = req.body;
 
     const existing = await PartnerRoute.findById(req.params.id);
     if (!existing) {
@@ -70,12 +78,19 @@ export const updatePartnerRoute = async (req: AuthRequest, res: Response): Promi
       return;
     }
 
+    // Derive partner name from the linked vendor
+    let derivedName = 'Partner';
+    if (vendorId) {
+      const vendor = await Vendor.findById(vendorId).select('companyName');
+      if (vendor) derivedName = vendor.companyName;
+    }
+
     const partnerData = {
-      name,
+      name: derivedName,
       sendCountry,
       receiveCountry,
-      logoUrl: logoUrl || '',
-      website: website || '',
+      logoUrl: '',
+      website: '',
       description: description || '',
       featured: featured ?? false,
       vendorId: vendorId || null,

@@ -4,6 +4,7 @@ import User from './models/User';
 import Vendor from './models/Vendor';
 import RemittanceRate from './models/RemittanceRate';
 import BankInterestRate from './models/BankInterestRate';
+import Bank from './models/Bank';
 import Blog from './models/Blog';
 import Review from './models/Review';
 import { UserRole, VendorStatus } from './types/enums';
@@ -18,6 +19,7 @@ const seed = async () => {
     Vendor.deleteMany({}),
     RemittanceRate.deleteMany({}),
     BankInterestRate.deleteMany({}),
+    Bank.deleteMany({}),
     Blog.deleteMany({}),
     Review.deleteMany({}),
   ]);
@@ -138,20 +140,31 @@ const seed = async () => {
   ];
   await RemittanceRate.insertMany(rates);
 
+  // Create banks
+  const [nabilBank, nibBank, globalIme, nmbBank, himalayan, prabhuBank, siddhartha] = await Promise.all([
+    Bank.create({ name: 'Nabil Bank', country: 'Nepal' }),
+    Bank.create({ name: 'Nepal Investment Bank', country: 'Nepal' }),
+    Bank.create({ name: 'Global IME Bank', country: 'Nepal' }),
+    Bank.create({ name: 'NMB Bank', country: 'Nepal' }),
+    Bank.create({ name: 'Himalayan Bank', country: 'Nepal' }),
+    Bank.create({ name: 'Prabhu Bank', country: 'Nepal' }),
+    Bank.create({ name: 'Siddhartha Bank', country: 'Nepal' }),
+  ]);
+
   // Create bank interest rates
   const bankRates = [
-    { bankName: 'Nabil Bank', plan: 'Fixed Deposit', duration: '1 Year', rate: 8.5, paymentTerm: 'Monthly' },
-    { bankName: 'Nabil Bank', plan: 'Savings', duration: 'N/A', rate: 5.0, paymentTerm: 'Quarterly' },
-    { bankName: 'Nepal Investment Bank', plan: 'Fixed Deposit', duration: '2 Years', rate: 9.0, paymentTerm: 'Monthly' },
-    { bankName: 'Nepal Investment Bank', plan: 'Fixed Deposit', duration: '1 Year', rate: 8.25, paymentTerm: 'Monthly' },
-    { bankName: 'Global IME Bank', plan: 'Fixed Deposit', duration: '1 Year', rate: 8.75, paymentTerm: 'Monthly' },
-    { bankName: 'Global IME Bank', plan: 'Savings', duration: 'N/A', rate: 5.25, paymentTerm: 'Quarterly' },
-    { bankName: 'NMB Bank', plan: 'Fixed Deposit', duration: '6 Months', rate: 7.5, paymentTerm: 'Monthly' },
-    { bankName: 'NMB Bank', plan: 'Fixed Deposit', duration: '1 Year', rate: 8.0, paymentTerm: 'Monthly' },
-    { bankName: 'Himalayan Bank', plan: 'Fixed Deposit', duration: '1 Year', rate: 8.25, paymentTerm: 'Monthly' },
-    { bankName: 'Himalayan Bank', plan: 'Fixed Deposit', duration: '3 Years', rate: 9.5, paymentTerm: 'Quarterly' },
-    { bankName: 'Prabhu Bank', plan: 'Savings', duration: 'N/A', rate: 5.5, paymentTerm: 'Quarterly' },
-    { bankName: 'Siddhartha Bank', plan: 'Fixed Deposit', duration: '1 Year', rate: 8.3, paymentTerm: 'Monthly' },
+    { bank: nabilBank._id, plan: 'Fixed Deposit', duration: '1 Year', rate: 8.5, paymentTerm: 'Monthly', featured: true },
+    { bank: nabilBank._id, plan: 'Savings', duration: 'N/A', rate: 5.0, paymentTerm: 'Quarterly', featured: false },
+    { bank: nibBank._id, plan: 'Fixed Deposit', duration: '2 Years', rate: 9.0, paymentTerm: 'Monthly', featured: true },
+    { bank: nibBank._id, plan: 'Fixed Deposit', duration: '1 Year', rate: 8.25, paymentTerm: 'Monthly', featured: false },
+    { bank: globalIme._id, plan: 'Fixed Deposit', duration: '1 Year', rate: 8.75, paymentTerm: 'Monthly', featured: true },
+    { bank: globalIme._id, plan: 'Savings', duration: 'N/A', rate: 5.25, paymentTerm: 'Quarterly', featured: false },
+    { bank: nmbBank._id, plan: 'Fixed Deposit', duration: '6 Months', rate: 7.5, paymentTerm: 'Monthly', featured: false },
+    { bank: nmbBank._id, plan: 'Fixed Deposit', duration: '1 Year', rate: 8.0, paymentTerm: 'Monthly', featured: true },
+    { bank: himalayan._id, plan: 'Fixed Deposit', duration: '1 Year', rate: 8.25, paymentTerm: 'Monthly', featured: false },
+    { bank: himalayan._id, plan: 'Fixed Deposit', duration: '3 Years', rate: 9.5, paymentTerm: 'Quarterly', featured: true },
+    { bank: prabhuBank._id, plan: 'Savings', duration: 'N/A', rate: 5.5, paymentTerm: 'Quarterly', featured: false },
+    { bank: siddhartha._id, plan: 'Fixed Deposit', duration: '1 Year', rate: 8.3, paymentTerm: 'Monthly', featured: true },
   ];
   await BankInterestRate.insertMany(bankRates);
 

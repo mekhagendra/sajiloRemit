@@ -15,9 +15,6 @@ interface RouteForm {
   receiveCountry: string;
   isActive: boolean;
   // partner fields
-  name: string;
-  logoUrl: string;
-  website: string;
   description: string;
   featured: boolean;
   vendorId: string;
@@ -27,9 +24,6 @@ const EMPTY: RouteForm = {
   sendCountry: '',
   receiveCountry: '',
   isActive: true,
-  name: '',
-  logoUrl: '',
-  website: '',
   description: '',
   featured: false,
   vendorId: '',
@@ -85,9 +79,6 @@ export default function AdminPartnerRoutes() {
       sendCountry: typeof r.sendCountry === 'object' ? r.sendCountry._id : r.sendCountry,
       receiveCountry: typeof r.receiveCountry === 'object' ? r.receiveCountry._id : r.receiveCountry,
       isActive: r.isActive,
-      name: p?.name ?? '',
-      logoUrl: p?.logoUrl ?? '',
-      website: p?.website ?? '',
       description: p?.description ?? '',
       featured: p?.featured ?? false,
       vendorId: p?.vendorId ?? '',
@@ -97,8 +88,8 @@ export default function AdminPartnerRoutes() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.sendCountry || !form.receiveCountry || !form.name.trim()) {
-      setError('Send country, receive country and partner name are required');
+    if (!form.sendCountry || !form.receiveCountry) {
+      setError('Send country and receive country are required');
       return;
     }
     setSubmitting(true);
@@ -184,25 +175,7 @@ export default function AdminPartnerRoutes() {
 
             {/* Partner details */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Partner Name *</label>
-              <input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="IME Money Transfer" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL</label>
-              <input value={form.logoUrl} onChange={e => setForm(f => ({ ...f, logoUrl: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="https://example.com/logo.png" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
-              <input value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="https://partner.com" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Linked Vendor <span className="text-gray-400">(pins their rates first)</span></label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Partner <span className="text-gray-400">(pins their rates first)</span></label>
               <select value={form.vendorId} onChange={e => setForm(f => ({ ...f, vendorId: e.target.value }))}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
                 <option value="">— No linked vendor —</option>
@@ -229,13 +202,6 @@ export default function AdminPartnerRoutes() {
                 <span className="text-sm text-gray-700 flex items-center gap-1"><Star className="w-3.5 h-3.5 text-yellow-500" /> Featured</span>
               </label>
             </div>
-            {form.logoUrl && (
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Logo preview:</p>
-                <img src={form.logoUrl} alt="logo" className="h-10 object-contain rounded border border-gray-200 p-1"
-                  onError={e => (e.currentTarget.style.display = 'none')} />
-              </div>
-            )}
             <div className="md:col-span-2 flex gap-3 pt-2">
               <button type="submit" disabled={submitting}
                 className="bg-green-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 transition-colors">

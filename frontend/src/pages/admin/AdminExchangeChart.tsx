@@ -7,7 +7,7 @@ import {
   adminGetSnapshot,
 } from '../../api';
 import type { Country, ExchangeChartCell, SnapshotListItem } from '../../types';
-import { BarChart3, Camera, History, Save, X, TrendingUp, TrendingDown, Minus, Monitor } from 'lucide-react';
+import { BarChart3, Camera, History, Save, X, TrendingUp, TrendingDown, Minus, Monitor, Filter } from 'lucide-react';
 
 interface ChartVendor {
   _id: string;
@@ -17,11 +17,22 @@ interface ChartVendor {
 
 type Matrix = Record<string, Record<string, ExchangeChartCell>>;
 
+const TODAY = new Date().toISOString().slice(0, 10);
+
 export default function AdminExchangeChart() {
-  const [countries, setCountries] = useState<Country[]>([]);
   const [vendors, setVendors] = useState<ChartVendor[]>([]);
   const [matrix, setMatrix] = useState<Matrix>({});
   const [loading, setLoading] = useState(true);
+
+  // Filters
+  const [filterDate, setFilterDate] = useState(TODAY);
+  const [filterVendorId, setFilterVendorId] = useState('');
+
+  // Display data (driven by filterDate — may be snapshot or live)
+  const [displayCountries, setDisplayCountries] = useState<Country[]>([]);
+  const [displayVendors, setDisplayVendors] = useState<ChartVendor[]>([]);
+  const [displayMatrix, setDisplayMatrix] = useState<Matrix>({});
+  const [displayLoading, setDisplayLoading] = useState(false);
 
   // Inline edit state
   const [editCell, setEditCell] = useState<{ vendorId: string; currency: string } | null>(null);
@@ -51,9 +62,12 @@ export default function AdminExchangeChart() {
     try {
       setLoading(true);
       const res = await adminGetExchangeChart();
-      setCountries(res.data.countries);
       setVendors(res.data.vendors);
       setMatrix(res.data.matrix);
+      // Initialise display with live data (default date = today)
+      setDisplayCountries(res.data.countries);
+      setDisplayVendors(res.data.vendors);
+      setDisplayMatrix(res.data.matrix);
     } catch {
       console.error('Failed to load exchange chart');
     } finally {
@@ -62,6 +76,51 @@ export default function AdminExchangeChart() {
   }, []);
 
   useEffect(() => { loadChart(); }, [loadChart]);
+
+  const loadDisplay = useCallback(async (date: string) => {
+    setEditCell(null);
+    if (date >= TODAY) {
+      // Today or future: reload live rates
+      setDisplayLoading(true);
+      try {
+        const res = await adminGetExchangeChart();
+        setVendors(res.data.vendors);
+        setMatrix(res.data.matrix);
+        setDisplayCountries(res.data.countries);
+        setDisplayVendors(res.data.vendors);
+        setDisplayMatrix(res.data.matrix);
+      } catch {
+        console.error('Failed to reload chart');
+      } finally {
+        setDisplayLoading(false);
+      }
+      return;
+    }
+    // Past date: load snapshot
+    setDisplayLoading(true);
+    try {
+      const res = await adminGetSnapshot(date);
+      setDisplayCountries(res.data.countries);
+      setDisplayVendors(res.data.vendors);
+      setDisplayMatrix(res.data.matrix);
+    } catch {
+      setDisplayCountries([]);
+      setDisplayVendors([]);
+      setDisplayMatrix({});
+    } finally {
+      setDisplayLoading(false);
+    }
+  }, []);
+
+  const handleDateChange = (date: string) => {
+    setFilterDate(date);
+    void loadDisplay(date);
+  };
+
+  const isEditable = filterDate === TODAY;
+  const visibleVendors = filterVendorId
+    ? displayVendors.filter(v => v._id === filterVendorId)
+    : displayVendors;
 
   const handleCellClick = (vendorId: string, currency: string) => {
     const cell = matrix[vendorId]?.[currency];
@@ -82,14 +141,16 @@ export default function AdminExchangeChart() {
         toCurrency: 'NPR',
         rate,
       });
-      // Update matrix locally
-      setMatrix((prev) => ({
+      // Update live matrix and display matrix
+      const patch = (prev: Matrix) => ({
         ...prev,
-        [editCell.vendorId]: {
-          ...prev[editCell.vendorId],
-          [editCell.currency]: res.data.cell,
+        [editCell!.vendorId]: {
+          ...prev[editCell!.vendorId],
+          [editCell!.currency]: res.data.cell,
         },
-      }));
+      });
+      setMatrix(patch);
+      setDisplayMatrix(patch);
       setEditCell(null);
     } catch {
       console.error('Failed to save rate');
@@ -306,24 +367,74 @@ export default function AdminExchangeChart() {
         )}
 
         <p className="text-sm text-gray-500">
-          Click any cell to update the rate. Rates are for <strong>→ NPR</strong> conversion.
-          A daily snapshot is taken automatically on server startup. Country names are shown in the header row, agents/vendors in the first column.
+          Rates are for <strong>→ NPR</strong> conversion. Select <strong>today</strong> to edit rates; past dates are read-only snapshots; future dates show current rates as a projection.
         </p>
 
+        {/* Date + Vendor filter bar */}
+        <div className="flex items-center gap-4 flex-wrap bg-white border border-gray-200 rounded-xl px-4 py-3">
+          <div className="flex items-center gap-2 text-gray-500">
+            <Filter className="w-4 h-4" />
+            <span className="text-sm font-medium text-gray-700">Filter</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-medium text-gray-500">Date</label>
+            <input
+              type="date"
+              value={filterDate}
+              onChange={e => handleDateChange(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            {filterDate !== TODAY && (
+              <button
+                onClick={() => handleDateChange(TODAY)}
+                className="text-xs text-green-600 hover:underline"
+              >
+                Reset to today
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-medium text-gray-500">Vendor</label>
+            <select
+              value={filterVendorId}
+              onChange={e => setFilterVendorId(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+            >
+              <option value="">All vendors</option>
+              {vendors.map(v => (
+                <option key={v._id} value={v._id}>{v.companyName}</option>
+              ))}
+            </select>
+          </div>
+          {filterDate !== TODAY && (
+            <span className={`ml-auto text-xs px-2.5 py-1 rounded-full font-medium border ${
+              filterDate < TODAY
+                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                : 'bg-blue-50 text-blue-700 border-blue-200'
+            }`}>
+              {filterDate < TODAY ? '🔒 Read-only — past snapshot' : '📊 Projection — future date (current rates)'}
+            </span>
+          )}
+        </div>
+
         {/* Current Chart */}
-        {loading ? (
+        {loading || displayLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse h-12 bg-gray-100 rounded" />
             ))}
           </div>
-        ) : vendors.length === 0 ? (
+        ) : visibleVendors.length === 0 ? (
           <div className="bg-white rounded-xl shadow-sm border p-8 text-center text-gray-500">
-            No approved vendors found. Approve vendors first to populate the chart.
+            {filterVendorId
+              ? 'No data for the selected vendor on this date.'
+              : filterDate < TODAY
+              ? 'No snapshot found for this date. Take a snapshot first using "Take Snapshot".'
+              : 'No approved vendors found. Approve vendors first to populate the chart.'}
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-            {renderMatrix(countries, vendors, matrix, true)}
+            {renderMatrix(displayCountries, visibleVendors, displayMatrix, isEditable)}
           </div>
         )}
 
