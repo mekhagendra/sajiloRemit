@@ -173,7 +173,7 @@ export const adminGetStatistics = () => api.get<{ statistics: Statistics }>('/ad
 // Admin - Blogs
 export const adminGetBlogs = (params?: { page?: number; limit?: number }) =>
   api.get<{ blogs: Blog[]; total: number; totalPages: number }>('/admin/blogs', { params });
-export const adminCreateBlog = (data: { title: string; thumbnail?: string; shortDescription: string; content: string; isPublished: boolean }) =>
+export const adminCreateBlog = (data: { title: string; thumbnail?: string; shortDescription: string; sourceUrl: string; isPublished: boolean }) =>
   api.post<{ blog: Blog }>('/blogs', data);
 export const adminUpdateBlog = (id: string, data: { title?: string; thumbnail?: string; shortDescription?: string; content?: string; isPublished?: boolean }) =>
   api.put<{ blog: Blog }>(`/blogs/${id}`, data);

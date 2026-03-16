@@ -83,7 +83,7 @@ export interface Blog {
   title: string;
   thumbnail: string;
   shortDescription: string;
-  content: string;
+  sourceUrl: string;
   author: { name: string };
   isPublished: boolean;
   createdAt: string;

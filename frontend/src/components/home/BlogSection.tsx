@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getBlogs } from '../../api';
 import type { Blog } from '../../types';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, ExternalLink } from 'lucide-react';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5000/api').replace(/\/api$/, '');
 const resolveUrl = (url: string) => (url?.startsWith('/') ? `${API_BASE}${url}` : url);
@@ -38,9 +38,11 @@ export default function BlogSection() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {blogs.map((blog) => (
-            <Link
+            <a
               key={blog._id}
-              to={`/blogs/${blog._id}`}
+              href={blog.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="group relative block rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300"
             >
               {/* Image */}
@@ -64,8 +66,9 @@ export default function BlogSection() {
                   {blog.title}
                 </h3>
                 <p className="mt-1 text-xs text-white/60 font-medium">{blog.author.name}</p>
+                <ExternalLink className="absolute top-2 right-2 w-4 h-4 text-white/50 group-hover:text-white/80 transition-colors" />
               </div>
-            </Link>
+            </a>
           ))}
         </div>
       )}

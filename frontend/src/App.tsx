@@ -15,7 +15,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import BankRatesPage from './pages/BankRatesPage';
 import BlogsPage from './pages/BlogsPage';
-import BlogDetailPage from './pages/BlogDetailPage';
+
 import RemitterRegisterPage from './pages/RemitterRegisterPage';
 import RemitterDashboard from './pages/RemitterDashboard';
 import EditorProfile from './pages/admin/EditorProfile';
@@ -28,7 +28,7 @@ const AdminReviews      = lazy(() => import('./pages/admin/AdminReviews'));
 const AdminBankRates    = lazy(() => import('./pages/admin/AdminBankRates'));
 const AdminBanks        = lazy(() => import('./pages/admin/AdminBanks'));
 const AdminBanners      = lazy(() => import('./pages/admin/AdminBanners'));
-const AdminBlogs        = lazy(() => import('./pages/admin/AdminBlogs'));  // pulls in CKEditor
+const AdminBlogs        = lazy(() => import('./pages/admin/AdminBlogs'));
 const AdminCountries    = lazy(() => import('./pages/admin/AdminCountries'));
 const AdminPartnerRoutes = lazy(() => import('./pages/admin/AdminPartnerRoutes'));
 const AdminExchangeChart = lazy(() => import('./pages/admin/AdminExchangeChart'));
@@ -58,7 +58,7 @@ export default function App() {
             <Route path="register" element={<RegisterPage />} />
             <Route path="bank-rates" element={<BankRatesPage />} />
             <Route path="blogs" element={<BlogsPage />} />
-            <Route path="blogs/:id" element={<BlogDetailPage />} />
+
             <Route path="join-us" element={<RemitterRegisterPage />} />
             <Route path="remitter/dashboard" element={<RemitterDashboard />} />
             <Route path="profile" element={<EditorProfile />} />

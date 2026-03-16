@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { getBlogs } from '../api';
-import { Link } from 'react-router-dom';
 import type { Blog } from '../types';
 import { BookOpen } from 'lucide-react';
 
@@ -37,9 +36,11 @@ export default function BlogsPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {blogs.map((blog) => (
-            <Link
+            <a
               key={blog._id}
-              to={`/blogs/${blog._id}`}
+              href={blog.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow flex flex-col"
             >
               {/* Image */}
@@ -71,7 +72,7 @@ export default function BlogsPage() {
                 </span>
                 <span className="text-xs text-gray-500 font-medium text-right">{blog.author.name}</span>
               </div>
-            </Link>
+            </a>
           ))}
         </div>
       )}

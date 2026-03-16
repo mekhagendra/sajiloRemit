@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { adminGetBlogs, adminCreateBlog, adminUpdateBlog, adminDeleteBlog } from '../../api';
 import type { Blog } from '../../types';
-import { Plus, Pencil, Trash2, X, Check, Eye, EyeOff, Images } from 'lucide-react';
-import RichTextEditor from '../../components/common/RichTextEditor';
+import { Plus, Pencil, Trash2, X, Check, Eye, EyeOff, Images, ExternalLink } from 'lucide-react';
 import GalleryPicker from '../../components/common/GalleryPicker';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5000/api').replace(/\/api$/, '');
@@ -12,7 +11,7 @@ const EMPTY_FORM = {
   title: '',
   thumbnail: '',
   shortDescription: '',
-  content: '',
+  sourceUrl: '',
   isPublished: false,
 };
 
@@ -54,7 +53,7 @@ export default function AdminBlogs() {
       title: b.title,
       thumbnail: b.thumbnail ?? '',
       shortDescription: b.shortDescription,
-      content: b.content,
+      sourceUrl: b.sourceUrl,
       isPublished: b.isPublished,
     });
     setError('');
@@ -70,16 +69,12 @@ export default function AdminBlogs() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!form.content.trim() || form.content === '<p>&nbsp;</p>') {
-      setError('Content is required.');
-      return;
-    }
     setSaving(true);
     try {
       const payload = {
         title: form.title.trim(),
         shortDescription: form.shortDescription.trim(),
-        content: form.content,
+        sourceUrl: form.sourceUrl.trim(),
         isPublished: form.isPublished,
         ...(form.thumbnail.trim() && { thumbnail: form.thumbnail.trim() }),
       };
@@ -160,11 +155,21 @@ export default function AdminBlogs() {
                 />
               </div>
               <div className="md:col-span-2">
+                <label className="block text-xs font-medium text-gray-600 mb-1">Source URL *</label>
+                <input
+                  required
+                  type="url"
+                  value={form.sourceUrl}
+                  onChange={(e) => setForm((f) => ({ ...f, sourceUrl: e.target.value }))}
+                  placeholder="https://example.com/article"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                />
+              </div>
+              <div className="md:col-span-2">
                 <label className="block text-xs font-medium text-gray-600 mb-1">
-                  Short Description * <span className="text-gray-400">(max 300 chars)</span>
+                  Short Description <span className="text-gray-400">(max 300 chars)</span>
                 </label>
                 <textarea
-                  required
                   maxLength={300}
                   rows={2}
                   value={form.shortDescription}
@@ -205,14 +210,6 @@ export default function AdminBlogs() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Content *</label>
-              <RichTextEditor
-                value={form.content}
-                onChange={(val) => setForm((f) => ({ ...f, content: val }))}
-              />
-            </div>
-
             <div className="flex items-center justify-between pt-1">
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input
@@ -251,6 +248,7 @@ export default function AdminBlogs() {
             <thead>
               <tr className="bg-gray-50 text-xs font-semibold text-gray-500 uppercase">
                 <th className="text-left px-6 py-3">Title</th>
+                <th className="text-left px-6 py-3">Source</th>
                 <th className="text-left px-6 py-3">Author</th>
                 <th className="text-left px-6 py-3">Date</th>
                 <th className="text-left px-6 py-3">Status</th>
@@ -271,6 +269,17 @@ export default function AdminBlogs() {
                       )}
                       <span className="text-sm font-medium text-gray-900 line-clamp-1">{blog.title}</span>
                     </div>
+                  </td>
+                  <td className="px-6 py-3">
+                    <a
+                      href={blog.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-green-600 hover:text-green-800 max-w-[180px] truncate"
+                    >
+                      <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                      <span className="truncate">{blog.sourceUrl}</span>
+                    </a>
                   </td>
                   <td className="px-6 py-3 text-sm text-gray-600">{blog.author.name}</td>
                   <td className="px-6 py-3 text-sm text-gray-500">
@@ -316,3 +325,4 @@ export default function AdminBlogs() {
     </>
   );
 }
+
