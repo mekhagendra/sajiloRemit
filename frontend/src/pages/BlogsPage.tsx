@@ -43,7 +43,7 @@ export default function BlogsPage() {
               className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow flex flex-col"
             >
               {/* Image */}
-              <div className="w-full h-48 bg-gray-100 overflow-hidden flex-shrink-0">
+              <div className="w-full aspect-video bg-gray-100 overflow-hidden flex-shrink-0">
                 {blog.thumbnail ? (
                   <img
                     src={resolveUrl(blog.thumbnail)}

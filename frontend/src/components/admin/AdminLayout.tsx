@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, Building2, MessageSquare, LogOut, Landmark, Building, FileText, Globe, ArrowLeftRight, Image, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, MessageSquare, LogOut, Landmark, Building, FileText, Globe, ArrowLeftRight, Image, BarChart3, Images } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const navItems = [
@@ -14,6 +14,7 @@ const navItems = [
   { to: '/admin/partner-routes', label: 'Partners', icon: ArrowLeftRight, end: false },
   { to: '/admin/banners', label: 'Banner Ads', icon: Image, end: false },
   { to: '/admin/exchange-chart', label: 'Exchange Chart', icon: BarChart3, end: false },
+  { to: '/admin/gallery', label: 'Media Gallery', icon: Images, end: false },
 ];
 
 export default function AdminLayout() {

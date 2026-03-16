@@ -22,16 +22,14 @@ export default function BlogSection() {
     <div>
       <div className="flex items-center space-x-2 mb-6">
         <BookOpen className="w-5 h-5 text-green-600" />
-        <h2 className="text-xl font-bold text-gray-900">Latest Blog Posts</h2>
+        <h2 className="text-xl font-bold text-gray-900">Updates</h2>
       </div>
 
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="animate-pulse">
-              <div className="h-40 bg-gray-200 rounded-xl mb-3" />
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-              <div className="h-3 bg-gray-100 rounded w-1/3 ml-auto" />
+            <div key={i} className="animate-pulse rounded-xl overflow-hidden">
+              <div className="aspect-video bg-gray-200" />
             </div>
           ))}
         </div>
@@ -43,31 +41,29 @@ export default function BlogSection() {
             <Link
               key={blog._id}
               to={`/blogs/${blog._id}`}
-              className="group block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+              className="group relative block rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300"
             >
-              {/* Row 1 — Image */}
-              <div className="w-full h-40 bg-gray-100 overflow-hidden">
+              {/* Image */}
+              <div className="w-full aspect-video bg-gray-900 overflow-hidden">
                 {blog.thumbnail ? (
                   <img
                     src={resolveUrl(blog.thumbnail)}
                     alt={blog.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-75"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
-                    <BookOpen className="w-8 h-8 text-green-300" />
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-800 to-green-950">
+                    <BookOpen className="w-10 h-10 text-green-400 opacity-60" />
                   </div>
                 )}
               </div>
-              {/* Row 2 — Title */}
-              <div className="px-4 pt-3">
-                <h3 className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:text-green-700 transition-colors">
+
+              {/* Gradient overlay + text pinned to bottom */}
+              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/30 to-transparent p-4">
+                <h3 className="font-semibold text-white text-sm leading-snug line-clamp-2 drop-shadow group-hover:text-green-300 transition-colors duration-200">
                   {blog.title}
                 </h3>
-              </div>
-              {/* Row 3 — Author (right-aligned) */}
-              <div className="px-4 pt-1 pb-3 text-right">
-                <span className="text-xs text-gray-400">{blog.author.name}</span>
+                <p className="mt-1 text-xs text-white/60 font-medium">{blog.author.name}</p>
               </div>
             </Link>
           ))}

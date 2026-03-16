@@ -187,3 +187,15 @@ export interface SnapshotData {
   vendors: { _id: string; companyName: string; logo: string }[];
   matrix: Record<string, Record<string, ExchangeChartCell>>;
 }
+
+// Gallery
+export interface GalleryFile {
+  _id: string;
+  filename: string;
+  originalName: string;
+  mimeType: string;
+  size: number;
+  url: string;
+  uploadedBy: string;
+  createdAt: string;
+}

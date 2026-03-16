@@ -23,6 +23,7 @@ import partnerRoutes from './routes/partners';
 import partnerRouteRoutes from './routes/partnerRoutes';
 import uploadRoutes from './routes/upload';
 import exchangeChartRoutes from './routes/exchangeChart';
+import galleryRoutes from './routes/gallery';
 
 const app = express();
 
@@ -89,6 +90,7 @@ app.use('/api/partners', partnerRoutes);
 app.use('/api/partner-routes', partnerRouteRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/exchange-chart', exchangeChartRoutes);
+app.use('/api/gallery', galleryRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {

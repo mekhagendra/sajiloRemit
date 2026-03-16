@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { adminGetBlogs, adminCreateBlog, adminUpdateBlog, adminDeleteBlog, adminUploadImage } from '../../api';
+import { adminGetBlogs, adminCreateBlog, adminUpdateBlog, adminDeleteBlog } from '../../api';
 import type { Blog } from '../../types';
-import { Plus, Pencil, Trash2, X, Check, Eye, EyeOff, Upload } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Check, Eye, EyeOff, Images } from 'lucide-react';
 import RichTextEditor from '../../components/common/RichTextEditor';
+import GalleryPicker from '../../components/common/GalleryPicker';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5003/api').replace(/\/api$/, '');
 const resolveUrl = (url: string) => (url?.startsWith('/') ? `${API_BASE}${url}` : url);
@@ -24,9 +25,8 @@ export default function AdminBlogs() {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState('');
-  const [uploading, setUploading] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchBlogs = () => {
     setLoading(true);
@@ -62,20 +62,9 @@ export default function AdminBlogs() {
     setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
-  const handleThumbnailFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    setError('');
-    try {
-      const res = await adminUploadImage(file);
-      setForm((f) => ({ ...f, thumbnail: res.data.url }));
-    } catch {
-      setError('Image upload failed. Please try again.');
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
+  const handleThumbnailSelect = (url: string) => {
+    setForm(f => ({ ...f, thumbnail: url }));
+    setShowGallery(false);
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -123,6 +112,13 @@ export default function AdminBlogs() {
   };
 
   return (
+    <>
+    {showGallery && (
+      <GalleryPicker
+        onSelect={handleThumbnailSelect}
+        onClose={() => setShowGallery(false)}
+      />
+    )}
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Blog Posts</h1>
@@ -182,12 +178,11 @@ export default function AdminBlogs() {
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
-                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                    onClick={() => setShowGallery(true)}
+                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   >
-                    <Upload className="w-4 h-4" />
-                    {uploading ? 'Uploading…' : form.thumbnail ? 'Change Image' : 'Upload Image'}
+                    <Images className="w-4 h-4" />
+                    {form.thumbnail ? 'Change Image' : 'Select from Gallery'}
                   </button>
                   {form.thumbnail && (
                     <button
@@ -198,17 +193,10 @@ export default function AdminBlogs() {
                       Remove
                     </button>
                   )}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleThumbnailFile}
-                  />
                 </div>
                 {form.thumbnail && (
                   <img
-                    src={resolveUrl(form.thumbnail)}
+                    src={form.thumbnail}
                     alt="preview"
                     className="mt-2 h-32 w-auto object-cover rounded-lg border border-gray-200"
                     onError={(e) => (e.currentTarget.style.display = 'none')}
@@ -325,5 +313,6 @@ export default function AdminBlogs() {
         </div>
       )}
     </div>
+    </>
   );
 }

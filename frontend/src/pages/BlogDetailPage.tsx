@@ -50,17 +50,6 @@ export default function BlogDetailPage() {
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Hero / Thumbnail banner */}
-      {blog.thumbnail && (
-        <div className="w-full h-72 sm:h-96 overflow-hidden">
-          <img
-            src={resolveUrl(blog.thumbnail)}
-            alt={blog.title}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
-
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Back link */}
         <Link
@@ -78,7 +67,7 @@ export default function BlogDetailPage() {
           </h1>
 
           {/* Meta row */}
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-8 pb-6 border-b border-gray-100">
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-6 pb-6 border-b border-gray-100">
             <span className="flex items-center gap-1.5">
               <UserRound className="w-4 h-4 text-green-500" />
               <span className="font-medium text-gray-700">{blog.author.name}</span>
@@ -89,7 +78,16 @@ export default function BlogDetailPage() {
             </span>
           </div>
 
-          {/* Short description (lead) */}
+          {/* Thumbnail — same width as content, 16:9 */}
+          {blog.thumbnail && (
+            <div className="w-full aspect-video overflow-hidden rounded-2xl mb-8">
+              <img
+                src={resolveUrl(blog.thumbnail)}
+                alt={blog.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
           {blog.shortDescription && (
             <p className="text-lg text-gray-600 leading-relaxed mb-8 font-light border-l-4 border-green-500 pl-4 italic">
               {blog.shortDescription}

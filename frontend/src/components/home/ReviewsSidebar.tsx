@@ -51,7 +51,7 @@ export default function ReviewsSidebar() {
       <div className="flex items-center justify-between mb-6">
         <Link to="/reviews" className="flex items-center space-x-2 group">
           <MessageSquare className="w-5 h-5 text-green-600" />
-          <h2 className="text-xl font-bold text-gray-900 group-hover:text-green-600 transition-colors">User Reviews</h2>
+          <h2 className="text-xl font-bold text-gray-900 group-hover:text-green-600 transition-colors">Latest Reviews</h2>
         </Link>
       </div>
 

@@ -18,6 +18,7 @@ import type {
   ExchangeChartCell,
   SnapshotListItem,
   SnapshotData,
+  GalleryFile,
 } from '../types';
 
 // Auth
@@ -204,3 +205,15 @@ export const adminListSnapshots = (params?: { page?: number; limit?: number }) =
   api.get<{ snapshots: SnapshotListItem[]; total: number; page: number; totalPages: number }>('/exchange-chart/snapshots', { params });
 export const adminGetSnapshot = (date: string) =>
   api.get<SnapshotData>(`/exchange-chart/snapshot/${date}`);
+
+// Admin - Gallery
+export const adminListGallery = (params?: { page?: number; limit?: number; search?: string }) =>
+  api.get<{ files: GalleryFile[]; total: number; page: number; totalPages: number }>('/gallery', { params });
+export const adminUploadToGallery = (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return api.post<{ file: GalleryFile }>('/gallery/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+};
+export const adminDeleteGalleryFile = (id: string) => api.delete(`/gallery/${id}`);

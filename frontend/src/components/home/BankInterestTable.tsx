@@ -20,7 +20,7 @@ export default function BankInterestTable() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
             <Landmark className="w-5 h-5 text-green-600" />
-            <h2 className="text-xl font-bold text-gray-900">Nepal Bank Interest Rates</h2>
+            <h2 className="text-xl font-bold text-gray-900">Save and Earn Interest</h2>
           </div>
         </div>
 

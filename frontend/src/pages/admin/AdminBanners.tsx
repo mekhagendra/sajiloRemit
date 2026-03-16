@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
-import { Plus, Pencil, Trash2, Image, UploadCloud } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Plus, Pencil, Trash2, Image, Images } from 'lucide-react';
 import {
   adminGetBanners,
   adminCreateBanner,
   adminUpdateBanner,
   adminDeleteBanner,
-  adminUploadImage,
 } from '../../api';
+import GalleryPicker from '../../components/common/GalleryPicker';
 import type { Banner } from '../../types';
 
 const POSITIONS = [
@@ -42,8 +42,7 @@ export default function AdminBanners() {
   const [editing, setEditing] = useState<Banner | null>(null);
   const [form, setForm] = useState<BannerForm>(EMPTY);
   const [submitting, setSubmitting] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [showGallery, setShowGallery] = useState(false);
 
   // Derive the API base (strip /api suffix) for building absolute image URLs
   const apiBase = (import.meta.env.VITE_API_URL as string || 'http://localhost:5003/api').replace(/\/api$/, '');
@@ -61,7 +60,7 @@ export default function AdminBanners() {
 
   useEffect(() => { load(); }, []);
 
-  const openAdd = () => { setEditing(null); setForm(EMPTY); setShowForm(true); if (fileRef.current) fileRef.current.value = ''; };
+  const openAdd = () => { setEditing(null); setForm(EMPTY); setShowForm(true); };
   const openEdit = (b: Banner) => {
     setEditing(b);
     setForm({
@@ -72,23 +71,11 @@ export default function AdminBanners() {
       isActive: b.isActive,
     });
     setShowForm(true);
-    if (fileRef.current) fileRef.current.value = '';
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    setError('');
-    try {
-      const res = await adminUploadImage(file);
-      setForm(f => ({ ...f, imageUrl: res.data.url }));
-    } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } }).response?.data?.message;
-      setError(msg || 'Failed to upload image');
-    } finally {
-      setUploading(false);
-    }
+  const handleImageSelect = (url: string) => {
+    setForm(f => ({ ...f, imageUrl: url }));
+    setShowGallery(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -128,6 +115,7 @@ export default function AdminBanners() {
   const positionLabel = (val: string) => POSITIONS.find(p => p.value === val)?.label ?? val;
 
   return (
+    <>
     <div className="p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -170,24 +158,14 @@ export default function AdminBanners() {
 
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">Banner Image *</label>
-              <div
-                className="flex items-center gap-3 border-2 border-dashed border-gray-300 rounded-lg px-4 py-3 cursor-pointer hover:border-green-400 transition-colors"
-                onClick={() => fileRef.current?.click()}
+              <button
+                type="button"
+                onClick={() => setShowGallery(true)}
+                className="flex items-center gap-2 border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-600 hover:border-green-500 hover:text-green-600 transition-colors"
               >
-                <UploadCloud className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                <span className="text-sm text-gray-500">
-                  {uploading ? 'Uploading…' : form.imageUrl ? 'Change image' : 'Click to upload image'}
-                </span>
-                {uploading && <span className="ml-auto text-xs text-green-600 animate-pulse">Uploading…</span>}
-              </div>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              <p className="text-xs text-gray-400 mt-1">Max 5 MB · JPEG, PNG, GIF, WebP, SVG</p>
+                <Images className="w-4 h-4" />
+                {form.imageUrl ? 'Change Image' : 'Select from Gallery'}
+              </button>
             </div>
 
             <div className="md:col-span-2">
@@ -218,9 +196,9 @@ export default function AdminBanners() {
             </div>
 
             <div className="md:col-span-2 flex gap-3 pt-2">
-              <button type="submit" disabled={submitting || uploading}
+              <button type="submit" disabled={submitting}
                 className="bg-green-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 transition-colors">
-                {submitting ? 'Saving…' : uploading ? 'Uploading…' : editing ? 'Update' : 'Create'}
+                {submitting ? 'Saving\u2026' : editing ? 'Update' : 'Create'}
               </button>
               <button type="button" onClick={() => { setShowForm(false); setError(''); }}
                 className="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
@@ -294,5 +272,7 @@ export default function AdminBanners() {
         )}
       </div>
     </div>
+    {showGallery && <GalleryPicker onSelect={handleImageSelect} onClose={() => setShowGallery(false)} />}
+    </>
   );
 }

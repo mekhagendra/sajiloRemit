@@ -26,6 +26,7 @@ import AdminBlogs from './pages/admin/AdminBlogs';
 import AdminCountries from './pages/admin/AdminCountries';
 import AdminPartnerRoutes from './pages/admin/AdminPartnerRoutes';
 import AdminExchangeChart from './pages/admin/AdminExchangeChart';
+import AdminGallery from './pages/admin/AdminGallery';
 
 export default function App() {
   return (
@@ -66,6 +67,7 @@ export default function App() {
             <Route path="countries" element={<AdminCountries />} />
             <Route path="partner-routes" element={<AdminPartnerRoutes />} />
             <Route path="exchange-chart" element={<AdminExchangeChart />} />
+            <Route path="gallery" element={<AdminGallery />} />
           </Route>
         </Routes>
       </BrowserRouter>
