@@ -4,15 +4,18 @@ import { adminListGallery, adminUploadToGallery, adminDeleteGalleryFile } from '
 import type { GalleryFile } from '../../types';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5000/api').replace(/\/api$/, '');
-// Old DB records may store a filesystem path (e.g. //var/www/…/gallery/file.jpg).
-// Detect that case and canonicalise to the /uploads/gallery/<filename> URL.
+// /uploads/ paths are served from the same origin as the frontend (Nginx in
+// prod, Vite /uploads proxy in dev) — return them as-is so the browser
+// resolves them relative to the current site origin without baking in
+// any localhost URL.
+// Old DB records that stored a raw filesystem path (e.g. //var/www/…) are
+// canonicalised by extracting the filename from the /gallery/ segment.
 const resolveUrl = (url: string): string => {
   if (!url) return url;
   if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  if (!url.startsWith('/uploads/')) {
-    const m = url.match(/\/gallery\/([^/?#]+)$/);
-    if (m) return `${API_BASE}/uploads/gallery/${m[1]}`;
-  }
+  if (url.startsWith('/uploads/')) return url;
+  const m = url.match(/\/gallery\/([^/?#]+)$/);
+  if (m) return `/uploads/gallery/${m[1]}`;
   return url.startsWith('/') ? `${API_BASE}${url}` : url;
 };
 const fmtBytes = (b: number) => (b < 1024 ? `${b} B` : b < 1024 * 1024 ? `${(b / 1024).toFixed(0)} KB` : `${(b / (1024 * 1024)).toFixed(1)} MB`);

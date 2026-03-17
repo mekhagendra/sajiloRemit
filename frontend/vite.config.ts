@@ -4,6 +4,13 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      // Dev: forward /uploads requests to the backend so images work without
+      // needing to hard-code the backend origin in resolveUrl.
+      '/uploads': 'http://localhost:5004',
+    },
+  },
   build: {
     rollupOptions: {
       output: {
