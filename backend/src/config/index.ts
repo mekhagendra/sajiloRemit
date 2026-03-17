@@ -1,4 +1,6 @@
 import dotenv from 'dotenv';
+// .env.local overrides .env for local development (load first so its values win)
+dotenv.config({ path: '.env.local' });
 dotenv.config();
 
 if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {

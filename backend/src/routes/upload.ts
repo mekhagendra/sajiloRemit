@@ -1,9 +1,7 @@
 import { Router, Request, Response } from 'express';
-import path from 'path';
 import { authenticate, authorize } from '../middleware/auth';
 import { upload } from '../middleware/upload';
 import { UserRole } from '../types/enums';
-import { config } from '../config';
 
 const router = Router();
 
@@ -18,8 +16,8 @@ router.post(
       res.status(400).json({ message: 'No file uploaded' });
       return;
     }
-    const relativePath = path.join(config.uploadDir, req.file.filename).replace(/\\/g, '/');
-    res.status(201).json({ url: `/${relativePath}` });
+    // URL is always under the /uploads static mount point — independent of the disk path in config.uploadDir
+    res.status(201).json({ url: `/uploads/${req.file.filename}` });
   }
 );
 

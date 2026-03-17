@@ -43,7 +43,8 @@ export const uploadToGallery = async (req: AuthRequest, res: Response): Promise<
       return;
     }
 
-    const url = `/${config.uploadDir}/gallery/${req.file.filename}`.replace(/\\/g, '/');
+    // URL is always under the /uploads static mount point — independent of the disk path in config.uploadDir
+    const url = `/uploads/gallery/${req.file.filename}`;
 
     const doc = await GalleryFile.create({
       filename: req.file.filename,

@@ -36,12 +36,10 @@ app.use(
   })
 );
 
-// Uploads must be served AFTER cors but with cross-origin resource policy
-// so the frontend (different port/domain) can load images.
-// We re-declare the static route here with CORP overridden to cross-origin,
-// which takes precedence over the helmet-protected route registered later.
+// Uploads: always mounted at /uploads URL regardless of where files live on disk.
+// CORP header overrides helmet so the frontend (different origin) can load images.
 app.use(
-  `/${config.uploadDir}`,
+  '/uploads',
   (_req, res, next) => { res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); next(); },
   express.static(path.resolve(config.uploadDir))
 );
