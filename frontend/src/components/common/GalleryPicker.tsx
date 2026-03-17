@@ -4,7 +4,17 @@ import { adminListGallery, adminUploadToGallery, adminDeleteGalleryFile } from '
 import type { GalleryFile } from '../../types';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5000/api').replace(/\/api$/, '');
-const resolveUrl = (url: string) => (url?.startsWith('/') ? `${API_BASE}${url}` : url);
+// Old DB records may store a filesystem path (e.g. //var/www/…/gallery/file.jpg).
+// Detect that case and canonicalise to the /uploads/gallery/<filename> URL.
+const resolveUrl = (url: string): string => {
+  if (!url) return url;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (!url.startsWith('/uploads/')) {
+    const m = url.match(/\/gallery\/([^/?#]+)$/);
+    if (m) return `${API_BASE}/uploads/gallery/${m[1]}`;
+  }
+  return url.startsWith('/') ? `${API_BASE}${url}` : url;
+};
 const fmtBytes = (b: number) => (b < 1024 ? `${b} B` : b < 1024 * 1024 ? `${(b / 1024).toFixed(0)} KB` : `${(b / (1024 * 1024)).toFixed(1)} MB`);
 
 interface Props {

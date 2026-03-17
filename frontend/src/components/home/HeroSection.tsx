@@ -5,7 +5,15 @@ import { COUNTRY_LIST } from '../../constants/countries';
 import { fetchAllBanners } from '../common/bannerCache';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5000/api').replace(/\/api$/, '');
-const resolveUrl = (url: string) => (url?.startsWith('/') ? `${API_BASE}${url}` : url);
+const resolveUrl = (url: string): string => {
+  if (!url) return url;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (!url.startsWith('/uploads/')) {
+    const m = url.match(/\/gallery\/([^/?#]+)$/);
+    if (m) return `${API_BASE}/uploads/gallery/${m[1]}`;
+  }
+  return url.startsWith('/') ? `${API_BASE}${url}` : url;
+};
 
 // Exclude Nepal (destination) from the "Send From" list
 const sendCountries = COUNTRY_LIST.filter((c) => c.currency !== 'NPR');

@@ -25,7 +25,16 @@ export const listGallery = async (req: AuthRequest, res: Response): Promise<void
       GalleryFile.countDocuments(filter),
     ]);
 
-    res.json({ files, total, page, totalPages: Math.ceil(total / limit) });
+    // Always derive the URL from the stored filename so that old records with a
+    // stale filesystem path (e.g. //var/www/sajiloRemit-uploads/gallery/…) are
+    // returned with the canonical /uploads/gallery/<filename> URL.
+    const normalized = files.map(f => {
+      const obj = f.toObject();
+      obj.url = `/uploads/gallery/${f.filename}`;
+      return obj;
+    });
+
+    res.json({ files: normalized, total, page, totalPages: Math.ceil(total / limit) });
   } catch {
     res.status(500).json({ message: 'Server error' });
   }
