@@ -3,7 +3,6 @@ export default function PrivacyPolicyPage() {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-3xl mx-auto px-4">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Privacy Policy</h1>
-        <p className="text-sm text-gray-500 mb-8">Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
 
         <div className="bg-white rounded-xl shadow-sm p-8 space-y-6 text-gray-600 leading-relaxed text-sm">
           <section>
