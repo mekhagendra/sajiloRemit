@@ -21,7 +21,7 @@ const nepal = COUNTRY_LIST.find((c) => c.currency === 'NPR')!
 
 export default function HeroSection() {
   const navigate = useNavigate();
-  const [fromCurrency, setFromCurrency] = useState('AUD');
+  const [fromCurrency, setFromCurrency] = useState('');
   const [heroBg, setHeroBg] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,6 +35,7 @@ export default function HeroSection() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!fromCurrency) return;
     navigate(`/best-rates?from=${fromCurrency}&to=NPR`);
   };
 
@@ -69,6 +70,7 @@ export default function HeroSection() {
                 onChange={(e) => setFromCurrency(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900"
               >
+                <option value="" disabled>Select a country</option>
                 {sendCountries.map((c) => (
                   <option key={c.currency} value={c.currency}>{c.flag} {c.name}</option>
                 ))}

@@ -10,12 +10,13 @@ const nepal = COUNTRY_LIST.find((c) => c.currency === 'NPR')!;
 
 export default function BestRatesPage() {
   const [searchParams] = useSearchParams();
-  const [fromCurrency, setFromCurrency] = useState(searchParams.get('from') || 'AUD');
+  const [fromCurrency, setFromCurrency] = useState(searchParams.get('from') || '');
   const [toCurrency] = useState('NPR');
   const [rates, setRates] = useState<RemittanceRate[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchRates = useCallback(() => {
+    if (!fromCurrency) return;
     setLoading(true);
     searchRates({ fromCurrency, toCurrency })
       .then((res) => setRates(res.data.rates))
@@ -47,6 +48,7 @@ export default function BestRatesPage() {
               onChange={(e) => setFromCurrency(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
             >
+              <option value="" disabled>Select a country</option>
               {sendCountries.map((c) => (
                 <option key={c.currency} value={c.currency}>{c.flag} {c.name}</option>
               ))}
@@ -74,6 +76,10 @@ export default function BestRatesPage() {
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="animate-pulse h-16 bg-gray-100 rounded-xl" />
           ))}
+        </div>
+      ) : !fromCurrency ? (
+        <div className="text-center py-12 text-gray-500">
+          <p className="text-lg">Select a country above to compare rates.</p>
         </div>
       ) : rates.length === 0 ? (
         <div className="text-center py-12 text-gray-500">

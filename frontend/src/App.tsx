@@ -11,6 +11,9 @@ import BestRatesPage from './pages/BestRatesPage';
 import ForexPage from './pages/ForexPage';
 import RemittersPage from './pages/RemittersPage';
 import ContactPage from './pages/ContactPage';
+import AboutPage from './pages/AboutPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import BankRatesPage from './pages/BankRatesPage';
@@ -54,6 +57,9 @@ export default function App() {
             <Route path="forex" element={<ForexPage />} />
             <Route path="remitters" element={<RemittersPage />} />
             <Route path="contact" element={<ContactPage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="privacy" element={<PrivacyPolicyPage />} />
+            <Route path="terms" element={<TermsOfServicePage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="bank-rates" element={<BankRatesPage />} />
