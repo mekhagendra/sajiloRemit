@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Menu, X, User, LogOut, LayoutDashboard, UserCog } from 'lucide-react';
+import { Menu, X, User, LogOut, LayoutDashboard, UserCog, MessageSquare } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
 export default function Navbar() {
@@ -89,6 +89,16 @@ export default function Navbar() {
                       >
                         <LayoutDashboard className="w-4 h-4" />
                         Dashboard
+                      </Link>
+                    )}
+                    {user.role === 'user' && (
+                      <Link
+                        to="/my-reviews"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600"
+                        onClick={() => setProfileOpen(false)}
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        My Reviews
                       </Link>
                     )}
                     <Link
@@ -183,6 +193,16 @@ export default function Navbar() {
                   >
                     <LayoutDashboard className="w-4 h-4" />
                     Dashboard
+                  </Link>
+                )}
+                {user.role === 'user' && (
+                  <Link
+                    to="/my-reviews"
+                    className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-lg"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    My Reviews
                   </Link>
                 )}
                 <Link

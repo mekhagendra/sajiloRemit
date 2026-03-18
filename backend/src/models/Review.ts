@@ -5,6 +5,9 @@ export interface IReview extends Document {
   remitterId: mongoose.Types.ObjectId;
   rating: number;
   text: string;
+  transactionDate: Date;
+  transactionNumber: string;
+  evidenceUrl?: string;
   isApproved: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -16,7 +19,10 @@ const reviewSchema = new Schema<IReview>(
     remitterId: { type: Schema.Types.ObjectId, ref: 'Remitter', required: true },
     rating: { type: Number, required: true, min: 1, max: 5 },
     text: { type: String, required: true, trim: true, maxlength: 1000 },
-    isApproved: { type: Boolean, default: true },
+    transactionDate: { type: Date, required: true },
+    transactionNumber: { type: String, required: true, trim: true, maxlength: 100 },
+    evidenceUrl: { type: String, trim: true },
+    isApproved: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

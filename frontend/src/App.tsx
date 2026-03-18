@@ -22,6 +22,7 @@ import BlogsPage from './pages/BlogsPage';
 import RemitterRegisterPage from './pages/RemitterRegisterPage';
 import RemitterDashboard from './pages/RemitterDashboard';
 import EditorProfile from './pages/admin/EditorProfile';
+import MyReviewsPage from './pages/MyReviewsPage';
 
 // Admin pages — lazily loaded (only fetched when an admin visits)
 const AdminDashboard    = lazy(() => import('./pages/admin/AdminDashboard'));
@@ -67,6 +68,7 @@ export default function App() {
 
             <Route path="join-us" element={<RemitterRegisterPage />} />
             <Route path="remitter/dashboard" element={<RemitterDashboard />} />
+            <Route path="my-reviews" element={<MyReviewsPage />} />
             <Route path="profile" element={<EditorProfile />} />
           </Route>
 

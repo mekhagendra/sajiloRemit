@@ -84,8 +84,17 @@ export const getLatestReviews = () => api.get<{ reviews: Review[] }>('/reviews/l
 export const getRemitterReviews = (remitterId: string) =>
   api.get<{ reviews: Review[] }>(`/reviews/remitter/${remitterId}`);
 
-export const createReview = (data: { remitterId: string; rating: number; text: string }) =>
-  api.post<{ review: Review }>('/reviews', data);
+export const createReview = (data: FormData) =>
+  api.post<{ review: Review }>('/reviews', data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+
+export const getUserReviews = () => api.get<{ reviews: Review[] }>('/reviews/my');
+
+export const updateReview = (id: string, data: FormData) =>
+  api.put<{ review: Review }>(`/reviews/${id}`, data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
 
 // Statistics
 export const getStatistics = () => api.get<{ statistics: Statistics }>('/statistics');

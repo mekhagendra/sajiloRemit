@@ -95,6 +95,9 @@ export interface Review {
   remitterId: { _id: string; companyName: string; logo?: string };
   rating: number;
   text: string;
+  transactionDate?: string;
+  transactionNumber?: string;
+  evidenceUrl?: string;
   isApproved: boolean;
   createdAt: string;
 }
