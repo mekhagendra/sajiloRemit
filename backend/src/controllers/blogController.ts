@@ -27,12 +27,13 @@ export const getBlogs = async (req: Request, res: Response): Promise<void> => {
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
 
-    const blogs = await Blog.find({ isPublished: true })
+    const allBlogs = await Blog.find({ isPublished: true })
       .populate('author', 'name')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
+    const blogs = allBlogs.filter((b) => b.author);
     const total = await Blog.countDocuments({ isPublished: true });
 
     res.json({ blogs, total, page, totalPages: Math.ceil(total / limit) });

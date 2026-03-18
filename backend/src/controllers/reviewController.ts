@@ -49,12 +49,13 @@ export const getRemitterReviews = async (req: Request, res: Response): Promise<v
 
 export const getLatestReviews = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const reviews = await Review.find({ isApproved: true })
+    const allReviews = await Review.find({ isApproved: true })
       .populate('userId', 'name')
       .populate('remitterId', 'companyName logo')
       .sort({ createdAt: -1 })
       .limit(6);
 
+    const reviews = allReviews.filter((r) => r.userId && r.remitterId);
     res.json({ reviews });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
