@@ -42,10 +42,10 @@ const remitterSchema = new Schema<IRemitter>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     companyName: { type: String, required: true, trim: true },
-    baseCountry: { type: String, required: true },
+    baseCountry: { type: String, default: '' },
     supportedCountries: [remitterCountrySchema],
     email: { type: String, required: true, lowercase: true, trim: true },
-    phone: { type: String, required: true },
+    phone: { type: String, default: '' },
     website: { type: String, trim: true },
     description: { type: String, trim: true },
     logo: { type: String, default: '' },

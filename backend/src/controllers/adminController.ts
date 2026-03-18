@@ -59,21 +59,27 @@ export const adminCreateRemitter = async (req: AuthRequest, res: Response): Prom
     const user = new User({ name, email, password: tempPassword, role: UserRole.REMITTER, status: UserStatus.ACTIVE });
     await user.save();
 
-    const remitter = new Remitter({
-      userId: user._id,
-      companyName,
-      baseCountry: baseCountry || '',
-      supportedCountries: supportedCountries || [],
-      email,
-      phone: phone || '',
-      website: website || '',
-      description: description || '',
-      logo: logo || '',
-      status: RemitterStatus.APPROVED,
-    });
-    await remitter.save();
+    try {
+      const remitter = new Remitter({
+        userId: user._id,
+        companyName,
+        baseCountry: baseCountry || '',
+        supportedCountries: supportedCountries || [],
+        email,
+        phone: phone || '',
+        website: website || '',
+        description: description || '',
+        logo: logo || '',
+        status: RemitterStatus.APPROVED,
+      });
+      await remitter.save();
 
-    res.status(201).json({ remitter, tempPassword: password ? undefined : tempPassword });
+      res.status(201).json({ remitter, tempPassword: password ? undefined : tempPassword });
+    } catch (remitterError) {
+      // Roll back the user if remitter creation fails
+      await User.findByIdAndDelete(user._id);
+      throw remitterError;
+    }
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
