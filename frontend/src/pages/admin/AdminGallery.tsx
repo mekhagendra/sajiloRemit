@@ -6,7 +6,8 @@ import type { GalleryFile } from '../../types';
 const API_BASE = (import.meta.env.VITE_API_URL as string || 'http://localhost:5000/api').replace(/\/api$/, '');
 const resolveUrl = (url: string): string => {
   if (!url) return url;
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const httpMatch = url.match(/^https?:\/\/[^/]+(\/uploads\/.+)$/);
+  if (httpMatch) return httpMatch[1];
   if (url.startsWith('/uploads/')) return url;
   const m = url.match(/\/gallery\/([^/?#]+)$/);
   if (m) return `/uploads/gallery/${m[1]}`;
