@@ -53,6 +53,7 @@ export const searchRates = async (req: Request, res: Response): Promise<void> =>
     const partnerRate: typeof rates = [];
     const others: typeof rates = [];
     for (const r of rates) {
+      if (!r.remitterId || !(r.remitterId as any)._id) continue; // skip orphaned rates
       const rid = (r.remitterId as any)?._id?.toString() ?? (r.remitterId as any)?.toString();
       if (partnerRemitterId && rid === partnerRemitterId) {
         partnerRate.push(r);
