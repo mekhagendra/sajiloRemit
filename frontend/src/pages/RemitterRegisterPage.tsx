@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function RemitterRegisterPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, login, token } = useAuth();
   const [form, setForm] = useState({
     companyName: '',
     baseCountry: '',
@@ -39,8 +39,9 @@ export default function RemitterRegisterPage() {
     setLoading(true);
 
     try {
-      await registerRemitter(form);
-      navigate('/');
+      const res = await registerRemitter(form);
+      if (res.data.user && token) login(res.data.user, token);
+      navigate('/remitter/dashboard');
     } catch (err) {
       setError((err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Registration failed');
     } finally {

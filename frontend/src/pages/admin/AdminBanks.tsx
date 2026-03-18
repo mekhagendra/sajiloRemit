@@ -3,7 +3,7 @@ import { adminGetBanks, adminCreateBank, adminUpdateBank, adminDeleteBank } from
 import type { Bank } from '../../types';
 import { Plus, Pencil, Trash2, X, Check } from 'lucide-react';
 
-const EMPTY_FORM = { name: '', logoUrl: '', country: '' };
+const EMPTY_FORM = { name: '', website: '', country: '' };
 
 export default function AdminBanks() {
   const [banks, setBanks] = useState<Bank[]>([]);
@@ -36,7 +36,7 @@ export default function AdminBanks() {
 
   const openEdit = (b: Bank) => {
     setEditingId(b._id);
-    setForm({ name: b.name, logoUrl: b.logoUrl ?? '', country: b.country ?? '' });
+    setForm({ name: b.name, website: b.website ?? '', country: b.country ?? '' });
     setError('');
     setShowForm(true);
   };
@@ -46,7 +46,7 @@ export default function AdminBanks() {
     setError('');
     const payload = {
       name: form.name.trim(),
-      ...(form.logoUrl.trim() && { logoUrl: form.logoUrl.trim() }),
+      ...(form.website.trim() && { website: form.website.trim() }),
       ...(form.country.trim() && { country: form.country.trim() }),
     };
     setSaving(true);
@@ -119,11 +119,11 @@ export default function AdminBanks() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Logo URL</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Website</label>
               <input
-                value={form.logoUrl}
-                onChange={(e) => setForm((f) => ({ ...f, logoUrl: e.target.value }))}
-                placeholder="https://example.com/logo.png"
+                value={form.website}
+                onChange={(e) => setForm((f) => ({ ...f, website: e.target.value }))}
+                placeholder="https://example.com"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
             </div>
@@ -166,7 +166,7 @@ export default function AdminBanks() {
               <tr className="bg-gray-50 text-xs font-semibold text-gray-500 uppercase">
                 <th className="text-left px-6 py-3">Bank Name</th>
                 <th className="text-left px-6 py-3">Country</th>
-                <th className="text-left px-6 py-3">Logo URL</th>
+                <th className="text-left px-6 py-3">Website</th>
                 <th className="text-left px-6 py-3">Actions</th>
               </tr>
             </thead>
@@ -176,9 +176,9 @@ export default function AdminBanks() {
                   <td className="px-6 py-3 text-sm font-medium text-gray-900">{bank.name}</td>
                   <td className="px-6 py-3 text-sm text-gray-600">{bank.country ?? '—'}</td>
                   <td className="px-6 py-3 text-sm text-gray-500 max-w-xs truncate">
-                    {bank.logoUrl ? (
-                      <a href={bank.logoUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                        {bank.logoUrl}
+                    {bank.website ? (
+                      <a href={bank.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                        {bank.website}
                       </a>
                     ) : (
                       '—'

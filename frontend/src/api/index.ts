@@ -51,7 +51,7 @@ export const getRemitters = (params?: { country?: string }) =>
 
 export const getRemitterById = (id: string) => api.get<{ remitter: Remitter }>(`/remitters/${id}`);
 
-export const registerRemitter = (data: Partial<Remitter>) => api.post<{ remitter: Remitter }>('/remitters', data);
+export const registerRemitter = (data: Partial<Remitter>) => api.post<{ remitter: Remitter; user: User }>('/remitters', data);
 
 export const getMyRemitterProfile = () => api.get<{ remitter: Remitter }>('/remitters/me');
 export const updateMyRemitterProfile = (data: Partial<Remitter>) => api.put<{ remitter: Remitter }>('/remitters', data);
@@ -126,9 +126,9 @@ export const adminDeleteBankRate = (id: string) => api.delete(`/bank-rates/${id}
 
 // Admin - Banks
 export const adminGetBanks = () => api.get<{ banks: Bank[] }>('/banks');
-export const adminCreateBank = (data: { name: string; logoUrl?: string; country?: string }) =>
+export const adminCreateBank = (data: { name: string; website?: string; country?: string }) =>
   api.post<{ bank: Bank }>('/banks', data);
-export const adminUpdateBank = (id: string, data: { name?: string; logoUrl?: string; country?: string }) =>
+export const adminUpdateBank = (id: string, data: { name?: string; website?: string; country?: string }) =>
   api.put<{ bank: Bank }>(`/banks/${id}`, data);
 export const adminDeleteBank = (id: string) => api.delete(`/banks/${id}`);
 

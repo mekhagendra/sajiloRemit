@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IBank extends Document {
   name: string;
-  logoUrl?: string;
+  website?: string;
   country?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -11,7 +11,7 @@ export interface IBank extends Document {
 const bankSchema = new Schema<IBank>(
   {
     name: { type: String, required: true, trim: true, unique: true },
-    logoUrl: { type: String, trim: true },
+    website: { type: String, trim: true },
     country: { type: String, trim: true },
   },
   { timestamps: true }

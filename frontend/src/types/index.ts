@@ -64,7 +64,7 @@ export interface BestRate {
 export interface Bank {
   _id: string;
   name: string;
-  logoUrl?: string;
+  website?: string;
   country?: string;
 }
 

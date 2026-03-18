@@ -27,9 +27,9 @@ export const registerRemitter = async (req: AuthRequest, res: Response): Promise
     });
 
     // Update user role to remitter
-    await User.findByIdAndUpdate(req.user!._id, { role: UserRole.REMITTER });
+    const updatedUser = await User.findByIdAndUpdate(req.user!._id, { role: UserRole.REMITTER }, { new: true });
 
-    res.status(201).json({ remitter });
+    res.status(201).json({ remitter, user: updatedUser });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }

@@ -5,7 +5,7 @@ import Remitter from '../models/Remitter';
 import Review from '../models/Review';
 import Blog from '../models/Blog';
 import RemittanceRate from '../models/RemittanceRate';
-import BankInterestRate from '../models/BankInterestRate';
+import Bank from '../models/Bank';
 import { AuthRequest } from '../middleware/auth';
 import { RemitterStatus, UserStatus, UserRole } from '../types/enums';
 
@@ -340,7 +340,7 @@ export const getStatistics = async (_req: Request, res: Response): Promise<void>
     const [remitterCount, userCount, bankCount, countryResult] = await Promise.all([
       Remitter.countDocuments({ status: RemitterStatus.APPROVED }),
       User.countDocuments(),
-      BankInterestRate.distinct('bankName').then((names) => names.length),
+      Bank.countDocuments(),
       RemittanceRate.distinct('fromCurrency'),
     ]);
 

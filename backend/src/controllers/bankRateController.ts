@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import BankInterestRate from '../models/BankInterestRate';
 import { AuthRequest } from '../middleware/auth';
 
-const BANK_POPULATE = { path: 'bank', select: 'name logoUrl country' };
+const BANK_POPULATE = { path: 'bank', select: 'name website country' };
 
 export const getBankRates = async (req: Request, res: Response): Promise<void> => {
   try {

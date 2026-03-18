@@ -13,8 +13,8 @@ export const getBanks = async (req: Request, res: Response): Promise<void> => {
 
 export const createBank = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { name, logoUrl, country } = req.body;
-    const bank = await Bank.create({ name, logoUrl, country });
+    const { name, website, country } = req.body;
+    const bank = await Bank.create({ name, website, country });
     res.status(201).json({ bank });
   } catch (error: any) {
     if (error.code === 11000) {
@@ -27,10 +27,10 @@ export const createBank = async (req: AuthRequest, res: Response): Promise<void>
 
 export const updateBank = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { name, logoUrl, country } = req.body;
+    const { name, website, country } = req.body;
     const bank = await Bank.findByIdAndUpdate(
       req.params.id,
-      { name, logoUrl, country },
+      { name, website, country },
       { new: true, runValidators: true }
     );
     if (!bank) {
