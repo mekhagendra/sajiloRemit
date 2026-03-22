@@ -30,7 +30,7 @@ export default function Navbar() {
   const navLinks = [
     { to: '/', label: 'Home' },
     { to: '/best-rates', label: 'Best Rate' },
-    { to: '/forex', label: 'Forex' },
+    // { to: '/forex', label: 'Forex' },
     { to: '/remitters', label: 'Remitters' },
     { to: '/contact', label: 'Contact Us' },
   ];
@@ -128,12 +128,12 @@ export default function Navbar() {
                 >
                   Login
                 </Link>
-                <Link
+                {/* <Link
                   to="/join-us"
                   className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium transition-colors"
                 >
                   Become a Remitter
-                </Link>
+                </Link> */}
               </>
             )}
           </div>

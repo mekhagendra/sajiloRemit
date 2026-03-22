@@ -81,7 +81,7 @@ app.use('/api/bank-rates', bankRateRoutes);
 app.use('/api/banks', bankRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/forex', forexRoutes);
+// app.use('/api/forex', forexRoutes);
 app.use('/api/statistics', statisticsRoutes);
 app.use('/api/countries', countryRoutes);
 app.use('/api/partners', partnerRoutes);
