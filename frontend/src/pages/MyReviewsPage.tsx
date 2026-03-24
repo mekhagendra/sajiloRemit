@@ -106,12 +106,12 @@ export default function MyReviewsPage() {
                       {remitter?.logo && (
                         <img
                           src={remitter.logo}
-                          alt={remitter.companyName}
+                          alt={remitter.legalName}
                           className="w-8 h-8 rounded-full object-cover border border-gray-200"
                         />
                       )}
                       <span className="font-semibold text-gray-900">
-                        {remitter?.companyName || 'Deleted Remitter'}
+                        {remitter?.legalName || 'Deleted Remitter'}
                       </span>
                     </div>
 
@@ -168,7 +168,7 @@ export default function MyReviewsPage() {
       {editingReview && editingReview.remitterId && typeof editingReview.remitterId === 'object' && (
         <ReviewModal
           remitterId={editingReview.remitterId._id}
-          companyName={editingReview.remitterId.companyName}
+          legalName={editingReview.remitterId.legalName}
           existingReview={editingReview}
           onClose={() => setEditingReview(null)}
           onSuccess={() => {

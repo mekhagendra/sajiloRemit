@@ -46,7 +46,7 @@ export const searchRates = async (req: Request, res: Response): Promise<void> =>
       .sort({ rate: -1 })
       .populate({
         path: 'remitterId',
-        select: 'companyName logo baseCountry',
+        select: 'legalName logo baseCountry remittanceUrl',
       });
 
     // Route partner's rate first, then everyone else sorted by best rate
@@ -131,7 +131,7 @@ export const getBestRates = async (_req: Request, res: Response): Promise<void> 
           toCurrency: 'NPR',
           rate: 1,
           unit: 1,
-          remitter: { companyName: 1, logo: 1 },
+          remitter: { legalName: 1, logo: 1 },
           updatedAt: 1,
         },
       },

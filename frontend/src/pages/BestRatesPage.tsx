@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { searchRates } from '../api';
 import type { RemittanceRate } from '../types';
-import { Search, Star } from 'lucide-react';
+import { Search, Star, ExternalLink } from 'lucide-react';
 import { COUNTRY_LIST } from '../constants/countries';
 
 const sendCountries = COUNTRY_LIST.filter((c) => c.currency !== 'NPR');
@@ -73,7 +73,7 @@ export default function BestRatesPage() {
 
       {/* Search form */}
       <form onSubmit={handleSearch} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-8">
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 items-end">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Send From</label>
             <select
@@ -117,15 +117,15 @@ export default function BestRatesPage() {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
             />
           </div>
-        </div>
-        <div className="flex justify-center sm:justify-end mt-3">
-          <button
-            type="submit"
-            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium whitespace-nowrap"
-          >
-            <Search className="w-4 h-4" />
-            <span>Search</span>
-          </button>
+          <div className="col-span-2 lg:col-span-1">
+            <button
+              type="submit"
+              className="w-full flex items-center justify-center gap-2 bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium whitespace-nowrap"
+            >
+              <Search className="w-4 h-4" />
+              <span>Search</span>
+            </button>
+          </div>
         </div>
       </form>
 
@@ -156,13 +156,15 @@ export default function BestRatesPage() {
                   <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{toCurrency}</th>
                   <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Fee</th>
                   <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Receivable</th>
+                  <th className="px-2 py-3"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {rates.map((rate, idx) => (
                   <tr
                     key={rate._id}
-                    className={`hover:bg-gray-50 transition-colors ${
+                    onClick={() => rate.remitter.remittanceUrl && window.open(rate.remitter.remittanceUrl, '_blank', 'noopener,noreferrer')}
+                    className={`hover:bg-gray-50 transition-colors ${rate.remitter.remittanceUrl ? 'cursor-pointer' : ''} ${
                       rate.isFeatured
                         ? 'bg-yellow-50 border-l-4 border-yellow-400'
                         : idx === 0
@@ -174,12 +176,12 @@ export default function BestRatesPage() {
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                           {rate.remitter.logo
-                            ? <img src={rate.remitter.logo} alt={rate.remitter.companyName} className="w-full h-full object-contain rounded-full p-0.5" onError={e => { e.currentTarget.style.display='none'; }} />
-                            : <span className="text-green-700 font-bold text-xs">{rate.remitter.companyName.charAt(0)}</span>
+                            ? <img src={rate.remitter.logo} alt={rate.remitter.legalName} className="w-full h-full object-contain rounded-full p-0.5" onError={e => { e.currentTarget.style.display='none'; }} />
+                            : <span className="text-green-700 font-bold text-xs">{rate.remitter.legalName.charAt(0)}</span>
                           }
                         </div>
                         <div>
-                          <span className="font-medium text-gray-900">{rate.remitter.companyName}</span>
+                          <span className="font-medium text-gray-900">{rate.remitter.legalName}</span>
                           <div className="flex items-center gap-1.5 mt-0.5">
                             {rate.isFeatured && (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded-full font-medium">
@@ -201,6 +203,11 @@ export default function BestRatesPage() {
                     <td className="px-6 py-4 text-right">
                       <span className="text-base font-semibold text-green-700">{getReceivable(rate).toFixed(2)}</span>
                     </td>
+                    <td className="px-2 py-4 text-center">
+                      {rate.remitter.remittanceUrl && (
+                        <ExternalLink className="w-4 h-4 text-gray-400" />
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -212,7 +219,8 @@ export default function BestRatesPage() {
             {rates.map((rate, idx) => (
               <div
                 key={rate._id}
-                className={`bg-white rounded-xl border shadow-sm p-4 ${
+                onClick={() => rate.remitter.remittanceUrl && window.open(rate.remitter.remittanceUrl, '_blank', 'noopener,noreferrer')}
+                className={`bg-white rounded-xl border shadow-sm p-4 ${rate.remitter.remittanceUrl ? 'cursor-pointer' : ''} ${
                   rate.isFeatured
                     ? 'border-yellow-400 border-l-4'
                     : idx === 0
@@ -224,11 +232,11 @@ export default function BestRatesPage() {
                   <div className="flex items-center gap-2">
                     <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                       {rate.remitter.logo
-                        ? <img src={rate.remitter.logo} alt={rate.remitter.companyName} className="w-full h-full object-contain rounded-full p-0.5" onError={e => { e.currentTarget.style.display='none'; }} />
-                        : <span className="text-green-700 font-bold text-xs">{rate.remitter.companyName.charAt(0)}</span>
+                        ? <img src={rate.remitter.logo} alt={rate.remitter.legalName} className="w-full h-full object-contain rounded-full p-0.5" onError={e => { e.currentTarget.style.display='none'; }} />
+                        : <span className="text-green-700 font-bold text-xs">{rate.remitter.legalName.charAt(0)}</span>
                       }
                     </div>
-                    <span className="font-semibold text-gray-900">{rate.remitter.companyName}</span>
+                    <span className="font-semibold text-gray-900">{rate.remitter.legalName}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     {rate.isFeatured && (

@@ -146,9 +146,13 @@ export const adminGetRemitters = () => api.get<{ remitters: Remitter[] }>('/admi
 export const adminUpdateRemitterStatus = (id: string, status: string) =>
   api.put(`/admin/remitters/${id}/status`, { status });
 export const adminCreateRemitter = (data: {
-  name: string; email: string; password?: string; companyName: string;
+  name: string; email: string; password?: string; legalName: string;
   baseCountry?: string; phone?: string; website?: string; description?: string; logo?: string;
 }) => api.post<{ remitter: Remitter; tempPassword?: string }>('/admin/remitters', data);
+export const adminUpdateRemitterProfile = (id: string, data: {
+  legalName?: string; baseCountry?: string; phone?: string; website?: string;
+  remittanceUrl?: string; description?: string; logo?: string;
+}) => api.put<{ remitter: Remitter }>(`/admin/remitters/${id}/profile`, data);
 export const adminGetRemitterRates = (remitterId: string) =>
   api.get<{ rates: RemittanceRate[] }>(`/admin/remitters/${remitterId}/rates`);
 export const adminCreateRateForRemitter = (remitterId: string, data: { fromCurrency: string; toCurrency: string; rate: number; unit?: number; fee?: number }) =>

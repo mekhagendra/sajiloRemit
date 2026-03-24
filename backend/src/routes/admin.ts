@@ -3,6 +3,7 @@ import {
   getAllRemitters,
   updateRemitterStatus,
   adminCreateRemitter,
+  adminUpdateRemitterProfile,
   adminGetRemitterRates,
   adminCreateRateForRemitter,
   adminUpdateRateForRemitter,
@@ -30,6 +31,7 @@ router.use(authenticate, authorize(UserRole.ADMIN));
 router.get('/remitters', getAllRemitters);
 router.post('/remitters', adminCreateRemitter);
 router.put('/remitters/:id/status', updateRemitterStatus);
+router.put('/remitters/:id/profile', adminUpdateRemitterProfile);
 router.get('/remitters/:id/rates', adminGetRemitterRates);
 router.post('/remitters/:id/rates', adminCreateRateForRemitter);
 router.put('/remitters/:id/rates/:rateId', adminUpdateRateForRemitter);

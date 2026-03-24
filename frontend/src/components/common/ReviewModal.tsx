@@ -5,13 +5,13 @@ import type { Review } from '../../types';
 
 interface Props {
   remitterId: string;
-  companyName: string;
+  legalName: string;
   existingReview?: Review;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export default function ReviewModal({ remitterId, companyName, existingReview, onClose, onSuccess }: Props) {
+export default function ReviewModal({ remitterId, legalName, existingReview, onClose, onSuccess }: Props) {
   const isEdit = !!existingReview;
   const [rating, setRating] = useState(existingReview?.rating || 0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -67,7 +67,7 @@ export default function ReviewModal({ remitterId, companyName, existingReview, o
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b">
-          <h2 className="text-lg font-bold text-gray-900">{isEdit ? 'Edit Review' : 'Review'} {companyName}</h2>
+          <h2 className="text-lg font-bold text-gray-900">{isEdit ? 'Edit Review' : 'Review'} {legalName}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>

@@ -11,7 +11,7 @@ import { BarChart3, Camera, History, Save, X, TrendingUp, TrendingDown, Minus, M
 
 interface ChartRemitter {
   _id: string;
-  companyName: string;
+  legalName: string;
   logo: string;
 }
 
@@ -257,7 +257,7 @@ export default function AdminExchangeChart() {
           {vList.map((v, idx) => (
             <tr key={v._id} className={`border-b ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'} hover:bg-green-50/40`}>
               <td className={`sticky left-0 z-10 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} px-4 py-2.5 font-medium text-gray-800 border-r whitespace-nowrap`}>
-                {v.companyName}
+                {v.legalName}
               </td>
               {cList.map((c) => {
                 const cell = m[v._id]?.[c.currency!];
@@ -402,7 +402,7 @@ export default function AdminExchangeChart() {
             >
               <option value="">All Remitters</option>
               {remitters.map(v => (
-                <option key={v._id} value={v._id}>{v.companyName}</option>
+                <option key={v._id} value={v._id}>{v.legalName}</option>
               ))}
             </select>
           </div>

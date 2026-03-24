@@ -6,7 +6,7 @@ import { RemitterStatus, UserRole } from '../types/enums';
 
 export const registerRemitter = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { companyName, baseCountry, email, phone, website, description, logo } = req.body;
+    const { legalName, baseCountry, email, phone, website, description, logo } = req.body;
 
     const existingRemitter = await Remitter.findOne({ userId: req.user!._id });
     if (existingRemitter) {
@@ -16,7 +16,7 @@ export const registerRemitter = async (req: AuthRequest, res: Response): Promise
 
     const remitter = await Remitter.create({
       userId: req.user!._id,
-      companyName,
+      legalName,
       baseCountry,
       supportedCountries: [],
       email,
@@ -75,7 +75,7 @@ export const updateRemitter = async (req: AuthRequest, res: Response): Promise<v
       return;
     }
 
-    const allowedFields = ['companyName', 'phone', 'website', 'description', 'logo'];
+    const allowedFields = ['legalName', 'phone', 'website', 'description', 'logo'];
     const updates: Record<string, unknown> = {};
     for (const field of allowedFields) {
       if (req.body[field] !== undefined) {

@@ -42,7 +42,7 @@ export default function BestRateSidebar() {
           <div className="grid grid-cols-3 [@media(min-width:480px)]:grid-cols-5 text-xs font-semibold text-gray-500 uppercase pb-2 border-b">
             <span className="col-span-2">From</span>
             <span>Rate</span>
-            <span className="hidden [@media(min-width:480px)]:block col-span-2 pl-2">Agent</span>
+            <span className="hidden [@media(min-width:480px)]:block col-span-2 pl-2">Remitter</span>
           </div>
           {rates.map((rate) => (
             <div key={rate.fromCurrency} className="grid grid-cols-3 [@media(min-width:480px)]:grid-cols-5 text-xs sm:text-sm py-2 border-b border-gray-50 items-center">
@@ -51,7 +51,7 @@ export default function BestRateSidebar() {
                 {currencyToName[rate.fromCurrency] ?? rate.fromCurrency}
               </span>
               <span className="font-semibold text-green-600">{rate.rate.toFixed(2)}</span>
-              <span className="hidden [@media(min-width:480px)]:block col-span-2 text-gray-600 truncate pl-2">{rate.remitter.companyName}</span>
+              <span className="hidden [@media(min-width:480px)]:block col-span-2 text-gray-600 truncate pl-2">{rate.remitter.legalName}</span>
             </div>
           ))}
         </div>

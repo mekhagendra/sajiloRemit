@@ -4,6 +4,7 @@ import {
   adminGetRemitters,
   adminUpdateRemitterStatus,
   adminCreateRemitter,
+  adminUpdateRemitterProfile,
   adminGetRemitterRates,
   adminCreateRateForRemitter,
   adminUpdateRateForRemitter,
@@ -20,7 +21,8 @@ const STATUS_COLORS: Record<string, string> = {
   suspended: 'bg-gray-100 text-gray-600',
 };
 
-const EMPTY_REMITTER = { name: '', email: '', password: '', companyName: '', baseCountry: '', phone: '', website: '', description: '' };
+const EMPTY_REMITTER = { name: '', email: '', password: '', legalName: '', baseCountry: '', phone: '', website: '', description: '' };
+const EMPTY_EDIT = { legalName: '', baseCountry: '', phone: '', website: '', remittanceUrl: '', description: '', logo: '' };
 const EMPTY_RATE = { fromCurrency: '', toCurrency: '', rate: '', unit: '1', fee: '0' };
 
 export default function AdminRemitters() {
@@ -48,6 +50,11 @@ export default function AdminRemitters() {
   const [editingRateId, setEditingRateId] = useState<string | null>(null);
   const [addingRateFor, setAddingRateFor] = useState<string | null>(null);
   const [rateSaving, setRateSaving] = useState(false);
+
+  // Edit remitter profile
+  const [editingRemitter, setEditingRemitter] = useState<Remitter | null>(null);
+  const [editForm, setEditForm] = useState(EMPTY_EDIT);
+  const [editSaving, setEditSaving] = useState(false);
 
   useEffect(() => {
     adminGetRemitters()
@@ -83,6 +90,35 @@ export default function AdminRemitters() {
       alert(e?.response?.data?.message || 'Failed to create remitter.');
     } finally {
       setRemitterSaving(false);
+    }
+  };
+
+  const startEditRemitter = (remitter: Remitter) => {
+    setEditingRemitter(remitter);
+    setEditForm({
+      legalName: remitter.legalName,
+      baseCountry: remitter.baseCountry,
+      phone: remitter.phone,
+      website: remitter.website,
+      remittanceUrl: remitter.remittanceUrl || '',
+      description: remitter.description,
+      logo: remitter.logo,
+    });
+  };
+
+  const handleEditRemitter = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingRemitter) return;
+    setEditSaving(true);
+    try {
+      const res = await adminUpdateRemitterProfile(editingRemitter._id, editForm);
+      setRemitters((prev) => prev.map((v) => v._id === editingRemitter._id ? res.data.remitter : v));
+      setEditingRemitter(null);
+    } catch (err) {
+      const e = err as { response?: { data?: { message?: string } } };
+      alert(e?.response?.data?.message || 'Failed to update remitter.');
+    } finally {
+      setEditSaving(false);
     }
   };
 
@@ -215,7 +251,7 @@ export default function AdminRemitters() {
               <form onSubmit={handleCreateRemitter} className="px-6 py-4 space-y-3 max-h-[70vh] overflow-y-auto">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Full Name *</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Brand Name *</label>
                     <input required value={remitterForm.name} onChange={(e) => setRemitterForm((p) => ({ ...p, name: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                   </div>
                   <div>
@@ -223,8 +259,8 @@ export default function AdminRemitters() {
                     <input required type="email" value={remitterForm.email} onChange={(e) => setRemitterForm((p) => ({ ...p, email: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Company Name *</label>
-                    <input required value={remitterForm.companyName} onChange={(e) => setRemitterForm((p) => ({ ...p, companyName: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Legal Name *</label>
+                    <input required value={remitterForm.legalName} onChange={(e) => setRemitterForm((p) => ({ ...p, legalName: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">Base Country</label>
@@ -255,6 +291,56 @@ export default function AdminRemitters() {
         </div>
       )}
 
+      {/* Edit Remitter Modal */}
+      {editingRemitter && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg">
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <h2 className="text-lg font-semibold text-gray-900">Edit Remitter Profile</h2>
+              <button onClick={() => setEditingRemitter(null)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+            </div>
+            <form onSubmit={handleEditRemitter} className="px-6 py-4 space-y-3 max-h-[70vh] overflow-y-auto">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Legal Name *</label>
+                  <input required value={editForm.legalName} onChange={(e) => setEditForm((p) => ({ ...p, legalName: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Base Country</label>
+                  <input value={editForm.baseCountry} onChange={(e) => setEditForm((p) => ({ ...p, baseCountry: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Phone</label>
+                  <input value={editForm.phone} onChange={(e) => setEditForm((p) => ({ ...p, phone: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Website</label>
+                  <input value={editForm.website} onChange={(e) => setEditForm((p) => ({ ...p, website: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Remittance URL</label>
+                  <input value={editForm.remittanceUrl} onChange={(e) => setEditForm((p) => ({ ...p, remittanceUrl: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Logo URL</label>
+                  <input value={editForm.logo} onChange={(e) => setEditForm((p) => ({ ...p, logo: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
+                <textarea rows={3} value={editForm.description} onChange={(e) => setEditForm((p) => ({ ...p, description: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={() => setEditingRemitter(null)} className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                <button type="submit" disabled={editSaving} className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
+                  {editSaving ? 'Saving…' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => <div key={i} className="animate-pulse h-16 bg-gray-200 rounded-lg" />)}
@@ -268,7 +354,7 @@ export default function AdminRemitters() {
               {/* Remitter row */}
               <div className="flex items-center px-6 py-4 gap-4">
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900">{remitter.companyName}</p>
+                  <p className="font-medium text-gray-900">{remitter.legalName}</p>
                   <p className="text-xs text-gray-400">{typeof remitter.userId === 'object' ? remitter.userId.name : ''}</p>
                 </div>
                 <div className="text-sm text-gray-600 w-48 hidden sm:block truncate">{remitter.email}</div>
@@ -279,6 +365,7 @@ export default function AdminRemitters() {
                   </span>
                 </div>
                 <div className="flex items-center space-x-1">
+                  <button onClick={() => startEditRemitter(remitter)} title="Edit Profile" className="text-gray-500 hover:text-gray-700"><Pencil className="w-5 h-5" /></button>
                   {remitter.status !== 'approved' && (
                     <button onClick={() => updateStatus(remitter._id, 'approved')} disabled={updating === remitter._id} title="Approve" className="text-green-600 hover:text-green-800 disabled:opacity-40"><CheckCircle className="w-5 h-5" /></button>
                   )}

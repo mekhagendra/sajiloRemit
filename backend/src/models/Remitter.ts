@@ -10,12 +10,13 @@ export interface IRemitterCountry {
 
 export interface IRemitter extends Document {
   userId: mongoose.Types.ObjectId;
-  companyName: string;
+  legalName: string;
   baseCountry: string;
   supportedCountries: IRemitterCountry[];
   email: string;
   phone: string;
   website: string;
+  remittanceUrl: string;
   description: string;
   logo: string;
   status: RemitterStatus;
@@ -41,12 +42,13 @@ const remitterCountrySchema = new Schema<IRemitterCountry>(
 const remitterSchema = new Schema<IRemitter>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    companyName: { type: String, required: true, trim: true },
+    legalName: { type: String, required: true, trim: true },
     baseCountry: { type: String, default: '' },
     supportedCountries: [remitterCountrySchema],
     email: { type: String, required: true, lowercase: true, trim: true },
     phone: { type: String, default: '' },
     website: { type: String, trim: true },
+    remittanceUrl: { type: String, trim: true, default: '' },
     description: { type: String, trim: true },
     logo: { type: String, default: '' },
     status: {

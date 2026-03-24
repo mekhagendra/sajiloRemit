@@ -72,7 +72,7 @@ const seed = async () => {
   // Create remitters
   const remitter1 = await Remitter.create({
     userId: remitterUser1._id,
-    companyName: 'WorldRemit',
+    legalName: 'WorldRemit',
     baseCountry: 'Australia',
     supportedCountries: [
       { countryCode: 'NP', canSend: false, canReceive: true, isActive: true },
@@ -89,7 +89,7 @@ const seed = async () => {
 
   const remitter2 = await Remitter.create({
     userId: remitterUser2._id,
-    companyName: 'Remitly',
+    legalName: 'Remitly',
     baseCountry: 'Australia',
     supportedCountries: [
       { countryCode: 'NP', canSend: false, canReceive: true, isActive: true },
@@ -106,7 +106,7 @@ const seed = async () => {
 
   const remitter3 = await Remitter.create({
     userId: remitterUser3._id,
-    companyName: 'Western Union',
+    legalName: 'Western Union',
     baseCountry: 'United States',
     supportedCountries: [
       { countryCode: 'NP', canSend: false, canReceive: true, isActive: true },

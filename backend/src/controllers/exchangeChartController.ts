@@ -17,7 +17,7 @@ export const getExchangeChart = async (_req: Request, res: Response): Promise<vo
   try {
     const [countries, remitters] = await Promise.all([
       Country.find({ isActive: true, currency: { $ne: 'NPR' } }).sort({ priority: 1, name: 1 }),
-      Remitter.find({ status: RemitterStatus.APPROVED }).select('_id companyName logo').sort({ companyName: 1 }),
+      Remitter.find({ status: RemitterStatus.APPROVED }).select('_id legalName logo').sort({ legalName: 1 }),
     ]);
 
     const remitterIds = remitters.map((v) => v._id);
@@ -169,7 +169,7 @@ export const getSnapshotByDate = async (req: Request, res: Response): Promise<vo
     }
 
     const [remitters, countries] = await Promise.all([
-      Remitter.find({ _id: { $in: Array.from(remitterIdSet) } }).select('_id companyName logo').sort({ companyName: 1 }),
+      Remitter.find({ _id: { $in: Array.from(remitterIdSet) } }).select('_id legalName logo').sort({ legalName: 1 }),
       Country.find({ currency: { $in: Array.from(currencySet) }, isActive: true }).sort({ priority: 1, name: 1 }),
     ]);
 

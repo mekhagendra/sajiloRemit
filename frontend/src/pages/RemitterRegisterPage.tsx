@@ -7,7 +7,7 @@ export default function RemitterRegisterPage() {
   const navigate = useNavigate();
   const { user, login, token } = useAuth();
   const [form, setForm] = useState({
-    companyName: '',
+    legalName: '',
     baseCountry: '',
     email: '',
     phone: '',
@@ -58,12 +58,12 @@ export default function RemitterRegisterPage() {
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Company Name *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Legal Name *</label>
           <input
             type="text"
-            name="companyName"
+            name="legalName"
             required
-            value={form.companyName}
+            value={form.legalName}
             onChange={handleChange}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
           />

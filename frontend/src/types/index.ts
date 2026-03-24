@@ -18,12 +18,13 @@ export interface RemitterCountry {
 export interface Remitter {
   _id: string;
   userId: User | string;
-  companyName: string;
+  legalName: string;
   baseCountry: string;
   supportedCountries: RemitterCountry[];
   email: string;
   phone: string;
   website: string;
+  remittanceUrl?: string;
   description: string;
   logo: string;
   status: 'pending' | 'approved' | 'rejected' | 'suspended';
@@ -41,9 +42,10 @@ export interface RemittanceRate {
   isFeatured?: boolean;
   remitter: {
     _id: string;
-    companyName: string;
+    legalName: string;
     logo: string;
     baseCountry: string;
+    remittanceUrl?: string;
   };
   createdAt: string;
   updatedAt: string;
@@ -55,7 +57,7 @@ export interface BestRate {
   rate: number;
   unit: number;
   remitter: {
-    companyName: string;
+    legalName: string;
     logo: string;
   };
   updatedAt: string;
@@ -92,7 +94,7 @@ export interface Blog {
 export interface Review {
   _id: string;
   userId: { _id: string; name: string };
-  remitterId: { _id: string; companyName: string; logo?: string };
+  remitterId: { _id: string; legalName: string; logo?: string };
   rating: number;
   text: string;
   transactionDate?: string;
@@ -174,7 +176,7 @@ export interface ExchangeChartCell {
 
 export interface ExchangeChartData {
   countries: Country[];
-  remitters: { _id: string; companyName: string; logo: string }[];
+  remitters: { _id: string; legalName: string; logo: string }[];
   matrix: Record<string, Record<string, ExchangeChartCell>>;
 }
 
@@ -187,7 +189,7 @@ export interface SnapshotListItem {
 export interface SnapshotData {
   date: string;
   countries: Country[];
-  remitters: { _id: string; companyName: string; logo: string }[];
+  remitters: { _id: string; legalName: string; logo: string }[];
   matrix: Record<string, Record<string, ExchangeChartCell>>;
 }
 

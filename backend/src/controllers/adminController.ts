@@ -41,10 +41,10 @@ export const updateRemitterStatus = async (req: AuthRequest, res: Response): Pro
 
 export const adminCreateRemitter = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { name, email, password, companyName, baseCountry, supportedCountries, phone, website, description, logo } = req.body;
+    const { name, email, password, legalName, baseCountry, supportedCountries, phone, website, description, logo } = req.body;
 
-    if (!name || !email || !companyName) {
-      res.status(400).json({ message: 'name, email and companyName are required' });
+    if (!name || !email || !legalName) {
+      res.status(400).json({ message: 'name, email and legalName are required' });
       return;
     }
 
@@ -62,7 +62,7 @@ export const adminCreateRemitter = async (req: AuthRequest, res: Response): Prom
     try {
       const remitter = new Remitter({
         userId: user._id,
-        companyName,
+        legalName,
         baseCountry: baseCountry || '',
         supportedCountries: supportedCountries || [],
         email,
@@ -156,6 +156,29 @@ export const adminDeleteRateForRemitter = async (req: AuthRequest, res: Response
   }
 };
 
+export const adminUpdateRemitterProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const remitter = await Remitter.findById(req.params.id);
+    if (!remitter) {
+      res.status(404).json({ message: 'Remitter not found' });
+      return;
+    }
+
+    const allowedFields = ['legalName', 'baseCountry', 'phone', 'website', 'remittanceUrl', 'description', 'logo'] as const;
+    const updates: Record<string, unknown> = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
+    }
+
+    const updated = await Remitter.findByIdAndUpdate(req.params.id, updates, { new: true }).populate('userId', 'name email');
+    res.json({ remitter: updated });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 export const adminToggleRemitterCountry = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const remitter = await Remitter.findById(req.params.id);
@@ -220,7 +243,7 @@ export const getAllReviews = async (_req: Request, res: Response): Promise<void>
   try {
     const reviews = await Review.find()
       .populate('userId', 'name email')
-      .populate('remitterId', 'companyName')
+      .populate('remitterId', 'legalName')
       .sort({ createdAt: -1 });
     res.json({ reviews });
   } catch (error) {
