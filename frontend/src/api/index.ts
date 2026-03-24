@@ -66,7 +66,8 @@ export const upsertRemitterCountry = (data: { countryCode: string; canSend: bool
 export const removeRemitterCountry = (code: string) => api.delete<{ remitter: Remitter }>(`/remitters/countries/${code}`);
 
 // Bank Rates
-export const getBankRates = (params?: { page?: number; limit?: number }) =>
+export const getBanks = () => api.get<{ banks: Bank[] }>('/banks');
+export const getBankRates = (params?: { page?: number; limit?: number; bank?: string }) =>
   api.get<{ rates: BankInterestRate[]; total: number; page: number; totalPages: number }>('/bank-rates', { params });
 
 export const getFeaturedBankRates = () =>
@@ -146,11 +147,11 @@ export const adminGetRemitters = () => api.get<{ remitters: Remitter[] }>('/admi
 export const adminUpdateRemitterStatus = (id: string, status: string) =>
   api.put(`/admin/remitters/${id}/status`, { status });
 export const adminCreateRemitter = (data: {
-  name: string; email: string; password?: string; legalName: string;
+  name: string; email: string; password?: string; brandName?: string; legalName: string;
   baseCountry?: string; phone?: string; website?: string; description?: string; logo?: string;
 }) => api.post<{ remitter: Remitter; tempPassword?: string }>('/admin/remitters', data);
 export const adminUpdateRemitterProfile = (id: string, data: {
-  legalName?: string; baseCountry?: string; phone?: string; website?: string;
+  brandName?: string; legalName?: string; baseCountry?: string; phone?: string; website?: string;
   remittanceUrl?: string; description?: string; logo?: string;
 }) => api.put<{ remitter: Remitter }>(`/admin/remitters/${id}/profile`, data);
 export const adminGetRemitterRates = (remitterId: string) =>

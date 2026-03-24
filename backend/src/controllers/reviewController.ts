@@ -51,7 +51,7 @@ export const getRemitterReviews = async (req: Request, res: Response): Promise<v
     const { remitterId } = req.params;
     const reviews = await Review.find({ remitterId, isApproved: true })
       .populate('userId', 'name')
-      .populate('remitterId', 'legalName')
+      .populate('remitterId', 'brandName legalName')
       .sort({ createdAt: -1 });
 
     res.json({ reviews });
@@ -64,7 +64,7 @@ export const getLatestReviews = async (_req: Request, res: Response): Promise<vo
   try {
     const allReviews = await Review.find({ isApproved: true })
       .populate('userId', 'name')
-      .populate('remitterId', 'legalName logo')
+      .populate('remitterId', 'brandName legalName logo')
       .sort({ createdAt: -1 })
       .limit(6);
 
@@ -78,7 +78,7 @@ export const getLatestReviews = async (_req: Request, res: Response): Promise<vo
 export const getUserReviews = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const reviews = await Review.find({ userId: req.user!._id })
-      .populate('remitterId', 'legalName logo')
+      .populate('remitterId', 'brandName legalName logo')
       .sort({ createdAt: -1 });
     res.json({ reviews });
   } catch (error) {
@@ -114,7 +114,7 @@ export const updateReview = async (req: AuthRequest, res: Response): Promise<voi
     await review.save();
 
     const populated = await Review.findById(review._id)
-      .populate('remitterId', 'legalName logo');
+      .populate('remitterId', 'brandName legalName logo');
 
     res.json({ review: populated });
   } catch (error) {

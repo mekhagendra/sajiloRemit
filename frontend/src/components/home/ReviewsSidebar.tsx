@@ -100,7 +100,7 @@ export default function ReviewsSidebar() {
                     </div>
                   </div>
                   <p className="text-sm text-gray-600 flex-1 overflow-hidden">{review.text}</p>
-                  <p className="mt-auto pt-1 text-xs text-gray-400 truncate">for {review.remitterId.legalName}</p>
+                  <p className="mt-auto pt-1 text-xs text-gray-400 truncate">for {review.remitterId.brandName || review.remitterId.legalName}</p>
                 </div>
               ))}
             </div>

@@ -51,7 +51,7 @@ export default function BestRateSidebar() {
                 {currencyToName[rate.fromCurrency] ?? rate.fromCurrency}
               </span>
               <span className="font-semibold text-green-600">{rate.rate.toFixed(2)}</span>
-              <span className="hidden [@media(min-width:480px)]:block col-span-2 text-gray-600 truncate pl-2">{rate.remitter?.legalName ?? '—'}</span>
+              <span className="hidden [@media(min-width:480px)]:block col-span-2 text-gray-600 truncate pl-2">{rate.remitter?.brandName || rate.remitter?.legalName || '—'}</span>
             </div>
           ))}
         </div>

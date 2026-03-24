@@ -77,11 +77,11 @@ export default function RemittersPage() {
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
                   {remitter.logo
-                    ? <img src={remitter.logo} alt={remitter.legalName} className="w-full h-full object-contain p-1" onError={e => { e.currentTarget.style.display = 'none'; }} />
+                    ? <img src={remitter.logo} alt={remitter.brandName || remitter.legalName} className="w-full h-full object-contain p-1" onError={e => { e.currentTarget.style.display = 'none'; }} />
                     : <Building className="w-6 h-6 text-green-600" />}
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900">{remitter.legalName}</h3>
+                  <h3 className="font-bold text-gray-900">{remitter.brandName || remitter.legalName}</h3>
                   <div className="flex items-center space-x-1 text-sm text-gray-500">
                     <Globe className="w-3 h-3" />
                     <span>{remitter.baseCountry}</span>
@@ -149,7 +149,7 @@ export default function RemittersPage() {
       {reviewRemitter && (
         <ReviewModal
           remitterId={reviewRemitter.remitter._id}
-          legalName={reviewRemitter.remitter.legalName}
+          brandName={reviewRemitter.remitter.brandName || reviewRemitter.remitter.legalName}
           existingReview={reviewRemitter.existingReview}
           onClose={() => setReviewRemitter(null)}
           onSuccess={handleReviewSuccess}

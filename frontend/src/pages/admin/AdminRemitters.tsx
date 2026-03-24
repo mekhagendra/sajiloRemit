@@ -21,8 +21,8 @@ const STATUS_COLORS: Record<string, string> = {
   suspended: 'bg-gray-100 text-gray-600',
 };
 
-const EMPTY_REMITTER = { name: '', email: '', password: '', legalName: '', baseCountry: '', phone: '', website: '', description: '' };
-const EMPTY_EDIT = { legalName: '', baseCountry: '', phone: '', website: '', remittanceUrl: '', description: '', logo: '' };
+const EMPTY_REMITTER = { name: '', email: '', password: '', brandName: '', legalName: '', baseCountry: '', phone: '', website: '', description: '' };
+const EMPTY_EDIT = { brandName: '', legalName: '', baseCountry: '', phone: '', website: '', remittanceUrl: '', description: '', logo: '' };
 const EMPTY_RATE = { fromCurrency: '', toCurrency: '', rate: '', unit: '1', fee: '0' };
 
 export default function AdminRemitters() {
@@ -96,6 +96,7 @@ export default function AdminRemitters() {
   const startEditRemitter = (remitter: Remitter) => {
     setEditingRemitter(remitter);
     setEditForm({
+      brandName: remitter.brandName || '',
       legalName: remitter.legalName,
       baseCountry: remitter.baseCountry,
       phone: remitter.phone,
@@ -251,12 +252,16 @@ export default function AdminRemitters() {
               <form onSubmit={handleCreateRemitter} className="px-6 py-4 space-y-3 max-h-[70vh] overflow-y-auto">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Brand Name *</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">User Name *</label>
                     <input required value={remitterForm.name} onChange={(e) => setRemitterForm((p) => ({ ...p, name: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">Email *</label>
                     <input required type="email" value={remitterForm.email} onChange={(e) => setRemitterForm((p) => ({ ...p, email: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Brand Name *</label>
+                    <input required value={remitterForm.brandName} onChange={(e) => setRemitterForm((p) => ({ ...p, brandName: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">Legal Name *</label>
@@ -301,6 +306,10 @@ export default function AdminRemitters() {
             </div>
             <form onSubmit={handleEditRemitter} className="px-6 py-4 space-y-3 max-h-[70vh] overflow-y-auto">
               <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Brand Name</label>
+                  <input value={editForm.brandName} onChange={(e) => setEditForm((p) => ({ ...p, brandName: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Legal Name *</label>
                   <input required value={editForm.legalName} onChange={(e) => setEditForm((p) => ({ ...p, legalName: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
@@ -354,7 +363,8 @@ export default function AdminRemitters() {
               {/* Remitter row */}
               <div className="flex items-center px-6 py-4 gap-4">
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900">{remitter.legalName}</p>
+                  <p className="font-medium text-gray-900">{remitter.brandName || remitter.legalName}</p>
+                  {remitter.brandName && remitter.legalName && remitter.brandName !== remitter.legalName && <p className="text-xs text-gray-400">{remitter.legalName}</p>}
                   <p className="text-xs text-gray-400">{typeof remitter.userId === 'object' ? remitter.userId.name : ''}</p>
                 </div>
                 <div className="text-sm text-gray-600 w-48 hidden sm:block truncate">{remitter.email}</div>

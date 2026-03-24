@@ -9,13 +9,15 @@ export const getBankRates = async (req: Request, res: Response): Promise<void> =
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
+    const filter: Record<string, unknown> = {};
+    if (req.query.bank) filter.bank = req.query.bank;
 
-    const rates = await BankInterestRate.find()
+    const rates = await BankInterestRate.find(filter)
       .populate(BANK_POPULATE)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
-    const total = await BankInterestRate.countDocuments();
+    const total = await BankInterestRate.countDocuments(filter);
 
     res.json({ rates, total, page, totalPages: Math.ceil(total / limit) });
   } catch (error) {

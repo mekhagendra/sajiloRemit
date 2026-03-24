@@ -30,6 +30,7 @@ export default function Navbar() {
   const navLinks = [
     { to: '/', label: 'Home' },
     { to: '/best-rates', label: 'Best Rate' },
+    { to: '/bank-rates', label: 'Bank Interest' },
     // { to: '/forex', label: 'Forex' },
     { to: '/remitters', label: 'Remitters' },
     { to: '/contact', label: 'Contact Us' },

@@ -39,8 +39,8 @@ export const createPartnerRoute = async (req: AuthRequest, res: Response): Promi
     // Derive partner name from the linked remitter, fallback to corridor placeholder
     let derivedName = 'Partner';
     if (remitterId) {
-      const remitter = await Remitter.findById(remitterId).select('legalName website logo');
-      if (remitter) derivedName = remitter.legalName;
+      const remitter = await Remitter.findById(remitterId).select('brandName legalName website logo');
+      if (remitter) derivedName = remitter.brandName || remitter.legalName;
     }
 
     // Create partner record first
@@ -81,8 +81,8 @@ export const updatePartnerRoute = async (req: AuthRequest, res: Response): Promi
     // Derive partner name from the linked remitter
     let derivedName = 'Partner';
     if (remitterId) {
-      const remitter = await Remitter.findById(remitterId).select('legalName');
-      if (remitter) derivedName = remitter.legalName;
+      const remitter = await Remitter.findById(remitterId).select('brandName legalName');
+      if (remitter) derivedName = remitter.brandName || remitter.legalName;
     }
 
     const partnerData = {

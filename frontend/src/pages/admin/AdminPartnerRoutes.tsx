@@ -180,7 +180,7 @@ export default function AdminPartnerRoutes() {
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
                 <option value="">— No linked Remitters —</option>
                 {remitters.map(v => (
-                  <option key={v._id} value={v._id}>{v.legalName}</option>
+                  <option key={v._id} value={v._id}>{v.brandName || v.legalName}</option>
                 ))}
               </select>
             </div>
@@ -272,7 +272,7 @@ export default function AdminPartnerRoutes() {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-gray-700 text-sm">
-                        {linkedRemitter ? linkedRemitter.legalName : <span className="text-gray-400">—</span>}
+                        {linkedRemitter ? (linkedRemitter.brandName || linkedRemitter.legalName) : <span className="text-gray-400">—</span>}
                       </td>
                       <td className="px-4 py-3 text-center">
                         {partner?.featured

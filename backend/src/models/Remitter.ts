@@ -10,6 +10,7 @@ export interface IRemitterCountry {
 
 export interface IRemitter extends Document {
   userId: mongoose.Types.ObjectId;
+  brandName: string;
   legalName: string;
   baseCountry: string;
   supportedCountries: IRemitterCountry[];
@@ -42,6 +43,7 @@ const remitterCountrySchema = new Schema<IRemitterCountry>(
 const remitterSchema = new Schema<IRemitter>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    brandName: { type: String, trim: true, default: '' },
     legalName: { type: String, required: true, trim: true },
     baseCountry: { type: String, default: '' },
     supportedCountries: [remitterCountrySchema],

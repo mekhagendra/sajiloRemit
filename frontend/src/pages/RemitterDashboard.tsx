@@ -126,6 +126,7 @@ export default function RemitterDashboard() {
 
   const openEditProfile = () => {
     setProfileForm({
+      brandName: remitter?.brandName ?? '',
       legalName: remitter?.legalName ?? '',
       email: remitter?.email ?? '',
       phone: remitter?.phone ?? '',
@@ -243,7 +244,7 @@ export default function RemitterDashboard() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{remitter?.legalName}</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{remitter?.brandName || remitter?.legalName}</h1>
           <p className="text-sm text-gray-500 mt-0.5">{remitter?.email}</p>
         </div>
         <button onClick={openEditProfile} className="flex items-center gap-1.5 text-sm border border-gray-300 rounded-lg px-3 py-2 hover:bg-gray-50 text-gray-700">
@@ -557,6 +558,10 @@ export default function RemitterDashboard() {
             <form onSubmit={saveProfile} className="px-6 py-4 space-y-3 max-h-[70vh] overflow-y-auto">
               {profileError && <p className="text-sm text-red-600">{profileError}</p>}
               <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Brand Name</label>
+                  <input value={profileForm.brandName ?? ''} onChange={(e) => setProfileForm((p) => ({ ...p, brandName: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Legal Name</label>
                   <input value={profileForm.legalName ?? ''} onChange={(e) => setProfileForm((p) => ({ ...p, legalName: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />

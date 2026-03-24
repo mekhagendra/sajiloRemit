@@ -7,6 +7,7 @@ export default function RemitterRegisterPage() {
   const navigate = useNavigate();
   const { user, login, token } = useAuth();
   const [form, setForm] = useState({
+    brandName: '',
     legalName: '',
     baseCountry: '',
     email: '',
@@ -57,16 +58,29 @@ export default function RemitterRegisterPage() {
       {error && <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">{error}</div>}
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Legal Name *</label>
-          <input
-            type="text"
-            name="legalName"
-            required
-            value={form.legalName}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Brand Name *</label>
+            <input
+              type="text"
+              name="brandName"
+              required
+              value={form.brandName}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Legal Name *</label>
+            <input
+              type="text"
+              name="legalName"
+              required
+              value={form.legalName}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+            />
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>

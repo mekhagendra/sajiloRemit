@@ -53,7 +53,7 @@ export default function AdminReviews() {
   };
 
   const remitterName = (review: Review) => {
-    if (review.remitterId && typeof review.remitterId === 'object') return review.remitterId.legalName;
+    if (review.remitterId && typeof review.remitterId === 'object') return review.remitterId.brandName || review.remitterId.legalName;
     if (review.remitterId) return String(review.remitterId);
     return 'Deleted Remitter';
   };

@@ -41,7 +41,7 @@ export const updateRemitterStatus = async (req: AuthRequest, res: Response): Pro
 
 export const adminCreateRemitter = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { name, email, password, legalName, baseCountry, supportedCountries, phone, website, description, logo } = req.body;
+    const { name, email, password, brandName, legalName, baseCountry, supportedCountries, phone, website, description, logo } = req.body;
 
     if (!name || !email || !legalName) {
       res.status(400).json({ message: 'name, email and legalName are required' });
@@ -62,6 +62,7 @@ export const adminCreateRemitter = async (req: AuthRequest, res: Response): Prom
     try {
       const remitter = new Remitter({
         userId: user._id,
+        brandName: brandName || '',
         legalName,
         baseCountry: baseCountry || '',
         supportedCountries: supportedCountries || [],
@@ -164,7 +165,7 @@ export const adminUpdateRemitterProfile = async (req: AuthRequest, res: Response
       return;
     }
 
-    const allowedFields = ['legalName', 'baseCountry', 'phone', 'website', 'remittanceUrl', 'description', 'logo'] as const;
+    const allowedFields = ['brandName', 'legalName', 'baseCountry', 'phone', 'website', 'remittanceUrl', 'description', 'logo'] as const;
     const updates: Record<string, unknown> = {};
     for (const field of allowedFields) {
       if (req.body[field] !== undefined) {
@@ -243,7 +244,7 @@ export const getAllReviews = async (_req: Request, res: Response): Promise<void>
   try {
     const reviews = await Review.find()
       .populate('userId', 'name email')
-      .populate('remitterId', 'legalName')
+      .populate('remitterId', 'brandName legalName')
       .sort({ createdAt: -1 });
     res.json({ reviews });
   } catch (error) {

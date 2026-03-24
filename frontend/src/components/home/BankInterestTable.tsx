@@ -36,8 +36,7 @@ export default function BankInterestTable() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="text-left px-3 sm:px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Bank Name</th>
-                    <th className="text-left px-3 sm:px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Plan</th>
+                    <th className="text-left px-3 sm:px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Bank</th>
                     <th className="text-left px-3 sm:px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Duration</th>
                     <th className="text-right px-3 sm:px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Rate</th>
                     <th className="text-left px-3 sm:px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Payment Term</th>
@@ -46,11 +45,13 @@ export default function BankInterestTable() {
                 <tbody className="divide-y divide-gray-100">
                   {rates.map((rate) => (
                     <tr key={rate._id} className="hover:bg-gray-50">
-                      <td className="px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-900">{typeof rate.bank === 'object' ? rate.bank.name : rate.bank}</td>
-                      <td className="px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{rate.plan}</td>
-                      <td className="px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{rate.duration}</td>
-                      <td className="px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm text-right font-semibold text-green-600">{rate.rate}%</td>
-                      <td className="px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{rate.paymentTerm}</td>
+                      <td className="px-3 sm:px-6 py-2 sm:py-3">
+                        <div className="text-sm sm:text-base font-bold text-gray-900">{typeof rate.bank === 'object' ? rate.bank.name : rate.bank}</div>
+                        <div className="text-sm sm:text-base text-gray-600">{rate.plan}</div>
+                      </td>
+                      <td className="px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-gray-600">{rate.duration}</td>
+                      <td className="px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-right font-semibold text-green-600">{rate.rate}%</td>
+                      <td className="px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-gray-600">{rate.paymentTerm}</td>
                     </tr>
                   ))}
                 </tbody>
