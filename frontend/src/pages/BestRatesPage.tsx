@@ -176,12 +176,12 @@ export default function BestRatesPage() {
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                           {rate.remitter.logo
-                            ? <img src={rate.remitter.logo} alt={rate.remitter.legalName} className="w-full h-full object-contain rounded-full p-0.5" onError={e => { e.currentTarget.style.display='none'; }} />
-                            : <span className="text-green-700 font-bold text-xs">{rate.remitter.legalName.charAt(0)}</span>
+                            ? <img src={rate.remitter.logo} alt={rate.remitter.legalName ?? ''} className="w-full h-full object-contain rounded-full p-0.5" onError={e => { e.currentTarget.style.display='none'; }} />
+                            : <span className="text-green-700 font-bold text-xs">{(rate.remitter.legalName ?? '?').charAt(0)}</span>
                           }
                         </div>
                         <div>
-                          <span className="font-medium text-gray-900">{rate.remitter.legalName}</span>
+                          <span className="font-medium text-gray-900">{rate.remitter.legalName ?? '—'}</span>
                           <div className="flex items-center gap-1.5 mt-0.5">
                             {rate.isFeatured && (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded-full font-medium">
@@ -232,11 +232,11 @@ export default function BestRatesPage() {
                   <div className="flex items-center gap-2">
                     <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                       {rate.remitter.logo
-                        ? <img src={rate.remitter.logo} alt={rate.remitter.legalName} className="w-full h-full object-contain rounded-full p-0.5" onError={e => { e.currentTarget.style.display='none'; }} />
-                        : <span className="text-green-700 font-bold text-xs">{rate.remitter.legalName.charAt(0)}</span>
+                        ? <img src={rate.remitter.logo} alt={rate.remitter.legalName ?? ''} className="w-full h-full object-contain rounded-full p-0.5" onError={e => { e.currentTarget.style.display='none'; }} />
+                        : <span className="text-green-700 font-bold text-xs">{(rate.remitter.legalName ?? '?').charAt(0)}</span>
                       }
                     </div>
-                    <span className="font-semibold text-gray-900">{rate.remitter.legalName}</span>
+                    <span className="font-semibold text-gray-900">{rate.remitter.legalName ?? '—'}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     {rate.isFeatured && (
