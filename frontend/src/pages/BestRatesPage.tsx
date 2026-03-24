@@ -2,16 +2,21 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { searchRates } from '../api';
 import type { RemittanceRate } from '../types';
-import { Search, ArrowRight, Star } from 'lucide-react';
+import { Search, Star } from 'lucide-react';
 import { COUNTRY_LIST } from '../constants/countries';
 
 const sendCountries = COUNTRY_LIST.filter((c) => c.currency !== 'NPR');
 const nepal = COUNTRY_LIST.find((c) => c.currency === 'NPR')!;
 
+type CalcMode = 'send' | 'receive';
+
 export default function BestRatesPage() {
   const [searchParams] = useSearchParams();
   const [fromCurrency, setFromCurrency] = useState(searchParams.get('from') || '');
   const [toCurrency] = useState('NPR');
+  const [sendAmount, setSendAmount] = useState('1');
+  const [receiveAmount, setReceiveAmount] = useState('');
+  const [calcMode, setCalcMode] = useState<CalcMode>('send');
   const [rates, setRates] = useState<RemittanceRate[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -34,14 +39,42 @@ export default function BestRatesPage() {
     fetchRates();
   };
 
+  const handleSendAmountChange = (value: string) => {
+    setSendAmount(value);
+    setCalcMode('send');
+    setReceiveAmount('');
+  };
+
+  const handleReceiveAmountChange = (value: string) => {
+    setReceiveAmount(value);
+    setCalcMode('receive');
+    setSendAmount('');
+  };
+
+  const getReceivable = (rate: RemittanceRate): number => {
+    if (calcMode === 'send') {
+      const amt = parseFloat(sendAmount) || 0;
+      return Math.max(0, amt * (rate.rate / rate.unit));
+    }
+    return parseFloat(receiveAmount) || 0;
+  };
+
+  const getSendingAmount = (rate: RemittanceRate): number => {
+    if (calcMode === 'receive') {
+      const recv = parseFloat(receiveAmount) || 0;
+      return recv * rate.unit / rate.rate;
+    }
+    return parseFloat(sendAmount) || 0;
+  };
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Compare Remittance Rates</h1>
 
       {/* Search form */}
       <form onSubmit={handleSearch} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-8">
-        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
-          <div className="flex-1">
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Send From</label>
             <select
               value={fromCurrency}
@@ -54,15 +87,41 @@ export default function BestRatesPage() {
               ))}
             </select>
           </div>
-          <div className="flex-1">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Amount</label>
+            <input
+              type="number"
+              min="0"
+              step="any"
+              value={sendAmount}
+              onChange={(e) => handleSendAmountChange(e.target.value)}
+              placeholder="Enter send amount"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
+            />
+          </div>
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Receive In</label>
             <select disabled className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed">
               <option value="NPR">{nepal.flag} {nepal.name}</option>
             </select>
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Amount</label>
+            <input
+              type="number"
+              min="0"
+              step="any"
+              value={receiveAmount}
+              onChange={(e) => handleReceiveAmountChange(e.target.value)}
+              placeholder="Enter receivable amount"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
+            />
+          </div>
+        </div>
+        <div className="flex justify-center sm:justify-end mt-3">
           <button
             type="submit"
-            className="flex items-center justify-center gap-2 bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium whitespace-nowrap"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium whitespace-nowrap"
           >
             <Search className="w-4 h-4" />
             <span>Search</span>
@@ -92,10 +151,11 @@ export default function BestRatesPage() {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-100">
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Agent</th>
-                  <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Corridor</th>
-                  <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Rate</th>
-                  <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Fee</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Remitter</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{fromCurrency || 'Send'}</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{toCurrency}</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Fee</th>
+                  <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Receivable</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -133,17 +193,14 @@ export default function BestRatesPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
-                        <span>{rate.fromCurrency}</span>
-                        <ArrowRight className="w-4 h-4 text-gray-400" />
-                        <span>{rate.toCurrency}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-4 py-4 text-right text-sm font-medium text-gray-700">{getSendingAmount(rate).toFixed(2)}</td>
+                    <td className="px-4 py-4 text-right">
                       <span className="text-base font-bold text-green-600">{rate.rate.toFixed(2)}</span>
                     </td>
-                    <td className="px-6 py-4 text-right text-sm text-gray-500">{rate.fee.toFixed(2)}</td>
+                    <td className="px-4 py-4 text-right text-sm text-gray-500">{rate.fee.toFixed(2)}</td>
+                    <td className="px-6 py-4 text-right">
+                      <span className="text-base font-semibold text-green-700">{getReceivable(rate).toFixed(2)}</span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -184,21 +241,22 @@ export default function BestRatesPage() {
                     )}
                   </div>
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-1.5 text-gray-500">
-                    <span>{rate.fromCurrency}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                    <span>{rate.toCurrency}</span>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <p className="text-xs text-gray-400">Send ({fromCurrency})</p>
+                    <p className="font-medium text-gray-700">{getSendingAmount(rate).toFixed(2)}</p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-xs text-gray-400">Rate</p>
-                      <p className="font-bold text-green-600">{rate.rate.toFixed(2)}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-gray-400">Fee</p>
-                      <p className="text-gray-700">{rate.fee.toFixed(2)}</p>
-                    </div>
+                  <div className="text-right">
+                    <p className="text-xs text-gray-400">Rate ({toCurrency})</p>
+                    <p className="font-bold text-green-600">{rate.rate.toFixed(2)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400">Fee</p>
+                    <p className="text-gray-700">{rate.fee.toFixed(2)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-gray-400">Receivable ({toCurrency})</p>
+                    <p className="font-semibold text-green-700">{getReceivable(rate).toFixed(2)}</p>
                   </div>
                 </div>
               </div>

@@ -72,7 +72,7 @@ export const searchRates = async (req: Request, res: Response): Promise<void> =>
         rate: r.rate,
         unit: r.unit,
         fee: r.fee,
-        receivedAmount: amount ? r.rate * Number(amount) : undefined,
+        receivedAmount: amount ? (r.rate / r.unit) * Number(amount) : undefined,
         remitter: r.remitterId,
         isFeatured: partnerRemitterId !== null && rid === partnerRemitterId,
         updatedAt: r.updatedAt,
