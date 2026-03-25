@@ -3,7 +3,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './context/AuthContext';
 import { lazy, Suspense } from 'react';
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '439313602393-2uke4oshll280oac494p6n0g1fkpm3r8.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '91873675854-0ah61v4nb87r2uci8lbrg344e0b7pdhh.apps.googleusercontent.com';
 import Layout from './components/layout/Layout';
 import AdminLayout from './components/admin/AdminLayout';
 import ProtectedRoute from './components/admin/ProtectedRoute';
