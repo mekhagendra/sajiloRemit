@@ -18,14 +18,17 @@ export default function BankRatesPage() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
     getBankRates({ page, limit: 20, ...(selectedBank ? { bank: selectedBank } : {}) })
       .then((res) => {
-        setRates(res.data.rates);
-        setTotalPages(res.data.totalPages);
+        if (!cancelled) {
+          setRates(res.data.rates);
+          setTotalPages(res.data.totalPages);
+        }
       })
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [page, selectedBank]);
 
   const filteredBanks = bankSearch
@@ -68,7 +71,7 @@ export default function BankRatesPage() {
               </div>
               <div className="overflow-y-auto max-h-48">
                 <button
-                  onClick={() => { setSelectedBank(''); setPage(1); setDropdownOpen(false); setBankSearch(''); }}
+                  onClick={() => { setLoading(true); setSelectedBank(''); setPage(1); setDropdownOpen(false); setBankSearch(''); }}
                   className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${!selectedBank ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-700'}`}
                 >
                   All Banks
@@ -76,7 +79,7 @@ export default function BankRatesPage() {
                 {filteredBanks.map((bank) => (
                   <button
                     key={bank._id}
-                    onClick={() => { setSelectedBank(bank._id); setPage(1); setDropdownOpen(false); setBankSearch(''); }}
+                    onClick={() => { setLoading(true); setSelectedBank(bank._id); setPage(1); setDropdownOpen(false); setBankSearch(''); }}
                     className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${selectedBank === bank._id ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-700'}`}
                   >
                     {bank.name}
@@ -130,7 +133,7 @@ export default function BankRatesPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-center space-x-4 mt-6">
               <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() => { setLoading(true); setPage((p) => Math.max(1, p - 1)); }}
                 disabled={page === 1}
                 className="flex items-center space-x-1 px-4 py-2 border border-gray-300 rounded-lg text-sm disabled:opacity-50"
               >
@@ -140,7 +143,7 @@ export default function BankRatesPage() {
                 Page {page} of {totalPages}
               </span>
               <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => { setLoading(true); setPage((p) => Math.min(totalPages, p + 1)); }}
                 disabled={page === totalPages}
                 className="flex items-center space-x-1 px-4 py-2 border border-gray-300 rounded-lg text-sm disabled:opacity-50"
               >
