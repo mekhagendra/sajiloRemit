@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { loginUser } from '../api';
+import { GoogleLogin } from '@react-oauth/google';
+import { loginUser, googleAuthLogin } from '../api';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
@@ -68,6 +69,43 @@ export default function LoginPage() {
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
+
+          <div className="text-right mt-2">
+            <Link to="/forgot-password" className="text-sm text-green-600 hover:text-green-700 font-medium">
+              Forgot Password?
+            </Link>
+          </div>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500">or</span>
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                setError('');
+                setLoading(true);
+                try {
+                  const res = await googleAuthLogin(credentialResponse.credential!);
+                  login(res.data.user, res.data.token);
+                  navigate('/');
+                } catch (err) {
+                  setError((err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Google login failed');
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              onError={() => setError('Google login failed')}
+              size="large"
+              width="100"
+              text="signin_with"
+            />
+          </div>
 
           <p className="text-center text-sm text-gray-500 mt-6">
             Don't have an account?{' '}

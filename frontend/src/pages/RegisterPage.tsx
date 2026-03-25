@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { registerUser } from '../api';
+import { GoogleLogin } from '@react-oauth/google';
+import { registerUser, googleAuthLogin } from '../api';
 import { useAuth } from '../context/AuthContext';
 
 export default function RegisterPage() {
@@ -102,6 +103,37 @@ export default function RegisterPage() {
               {loading ? 'Creating account...' : 'Register'}
             </button>
           </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500">or</span>
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                setError('');
+                setLoading(true);
+                try {
+                  const res = await googleAuthLogin(credentialResponse.credential!);
+                  login(res.data.user, res.data.token);
+                  navigate('/');
+                } catch (err) {
+                  setError((err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Google sign-up failed');
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              onError={() => setError('Google sign-up failed')}
+              size="large"
+              width="100"
+              text="signup_with"
+            />
+          </div>
 
           <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?{' '}

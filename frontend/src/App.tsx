@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './context/AuthContext';
 import { lazy, Suspense } from 'react';
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '439313602393-2uke4oshll280oac494p6n0g1fkpm3r8.apps.googleusercontent.com';
 import Layout from './components/layout/Layout';
 import AdminLayout from './components/admin/AdminLayout';
 import ProtectedRoute from './components/admin/ProtectedRoute';
@@ -16,6 +19,8 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import BankRatesPage from './pages/BankRatesPage';
 import BlogsPage from './pages/BlogsPage';
 
@@ -49,6 +54,7 @@ function AdminFallback() {
 
 export default function App() {
   return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     <AuthProvider>
       <BrowserRouter>
         <Routes>
@@ -63,6 +69,8 @@ export default function App() {
             <Route path="terms" element={<TermsOfServicePage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
+            <Route path="forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="reset-password" element={<ResetPasswordPage />} />
             <Route path="bank-rates" element={<BankRatesPage />} />
             <Route path="blogs" element={<BlogsPage />} />
 
@@ -98,5 +106,6 @@ export default function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }

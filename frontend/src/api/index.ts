@@ -28,6 +28,15 @@ export const registerUser = (data: { name: string; email: string; password: stri
 export const loginUser = (data: { email: string; password: string }) =>
   api.post<AuthResponse>('/auth/login', data);
 
+export const googleAuthLogin = (credential: string) =>
+  api.post<AuthResponse>('/auth/google', { credential });
+
+export const forgotPassword = (email: string) =>
+  api.post<{ message: string }>('/auth/forgot-password', { email });
+
+export const resetPasswordApi = (data: { token: string; password: string }) =>
+  api.post<{ message: string }>('/auth/reset-password', data);
+
 export const getMe = () => api.get<{ user: AuthResponse['user'] }>('/auth/me');
 
 export const updateProfile = (data: { name: string }) =>

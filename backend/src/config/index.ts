@@ -16,4 +16,10 @@ export const config = {
   exchangeRateApiKey: process.env.EXCHANGE_RATE_API_KEY || '',
   uploadDir: process.env.UPLOAD_DIR || 'uploads',
   rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX || '1000', 10),
+  googleClientId: process.env.Google_Client_ID || '',
+  googleClientSecret: process.env.Google_Client_Secret || '',
+  smtpHost: process.env.SMTP_HOST || 'smtp.gmail.com',
+  smtpPort: parseInt(process.env.SMTP_PORT || '587', 10),
+  smtpUser: process.env.SMTP_USER || '',
+  smtpPass: process.env.SMTP_PASS || '',
 };
