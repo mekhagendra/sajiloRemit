@@ -4,13 +4,14 @@ import { AuthRequest } from '../middleware/auth';
 
 export const createBlog = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { title, thumbnail, shortDescription, sourceUrl, isPublished } = req.body;
+    const { title, thumbnail, shortDescription, sourceUrl, sourceName, isPublished } = req.body;
 
     const blog = await Blog.create({
       title,
       thumbnail,
       shortDescription,
       sourceUrl,
+      sourceName,
       author: req.user!._id,
       isPublished: isPublished || false,
     });

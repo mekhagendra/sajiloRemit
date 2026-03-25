@@ -70,10 +70,17 @@ export default function BlogSection() {
 
               {/* Gradient overlay + text pinned to bottom */}
               <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/30 to-transparent p-4">
-                <h3 className="font-semibold text-white text-sm leading-snug line-clamp-2 drop-shadow group-hover:text-green-300 transition-colors duration-200">
+                <h3 className="font-semibold text-white text-[20px] leading-snug line-clamp-2 drop-shadow group-hover:text-green-300 transition-colors duration-200">
                   {blog.title}
                 </h3>
-                <p className="mt-1 text-xs text-white/60 font-medium">{blog.author.name}</p>
+                <div className="mt-1 flex items-end justify-between">
+                  <span className="text-xs text-white/40">
+                    {new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </span>
+                  <span className="text-xs text-white/60 font-medium text-right">
+                    {blog.sourceName ? `Source - ${blog.sourceName}` : blog.author.name}
+                  </span>
+                </div>
                 <ExternalLink className="absolute top-2 right-2 w-4 h-4 text-white/50 group-hover:text-white/80 transition-colors" />
               </div>
             </a>

@@ -11,14 +11,13 @@ import { AuthRequest } from '../middleware/auth';
 const transporter = nodemailer.createTransport({
   host: config.smtpHost,
   port: config.smtpPort,
-  secure: config.smtpPort === 465,
-  requireTLS: true,
+  secure: false,
   auth: {
     user: config.smtpUser,
     pass: config.smtpPass,
   },
   tls: {
-    ciphers: 'SSLv3',
+    minVersion: 'TLSv1.2',
   },
 });
 
@@ -223,7 +222,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     const resetUrl = `${config.frontendUrl}/reset-password?token=${resetToken}`;
 
     await transporter.sendMail({
-      from: config.smtpUser,
+      from: `"SajiloRemit" <${config.smtpUser}>`,
       to: user.email,
       subject: 'SajiloRemit - Password Reset',
       html: `
@@ -239,6 +238,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
 
     res.json({ message: 'If an account with that email exists, a reset link has been sent.' });
   } catch (error) {
+    console.error('Forgot password error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };

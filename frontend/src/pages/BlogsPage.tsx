@@ -68,7 +68,7 @@ export default function BlogsPage() {
 
               {/* Title */}
               <div className="px-5 pt-4">
-                <h2 className="font-bold text-gray-900 text-base leading-snug line-clamp-2 group-hover:text-green-700 transition-colors">
+                <h2 className="font-bold text-gray-900 text-[22px] leading-snug line-clamp-2 group-hover:text-green-700 transition-colors">
                   {blog.title}
                 </h2>
               </div>
@@ -78,7 +78,9 @@ export default function BlogsPage() {
                 <span className="text-xs text-gray-400">
                   {new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
-                <span className="text-xs text-gray-500 font-medium text-right">{blog.author.name}</span>
+                <span className="text-xs text-gray-500 font-medium text-right">
+                  {blog.sourceName ? `Source - ${blog.sourceName}` : blog.author.name}
+                </span>
               </div>
             </a>
           ))}

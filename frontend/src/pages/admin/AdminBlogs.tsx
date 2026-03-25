@@ -20,6 +20,7 @@ const EMPTY_FORM = {
   thumbnail: '',
   shortDescription: '',
   sourceUrl: '',
+  sourceName: '',
   isPublished: false,
 };
 
@@ -62,6 +63,7 @@ export default function AdminBlogs() {
       thumbnail: b.thumbnail ?? '',
       shortDescription: b.shortDescription,
       sourceUrl: b.sourceUrl,
+      sourceName: b.sourceName ?? '',
       isPublished: b.isPublished,
     });
     setError('');
@@ -83,6 +85,7 @@ export default function AdminBlogs() {
         title: form.title.trim(),
         shortDescription: form.shortDescription.trim(),
         sourceUrl: form.sourceUrl.trim(),
+        sourceName: form.sourceName.trim(),
         isPublished: form.isPublished,
         ...(form.thumbnail.trim() && { thumbnail: form.thumbnail.trim() }),
       };
@@ -170,6 +173,15 @@ export default function AdminBlogs() {
                   value={form.sourceUrl}
                   onChange={(e) => setForm((f) => ({ ...f, sourceUrl: e.target.value }))}
                   placeholder="https://example.com/article"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-xs font-medium text-gray-600 mb-1">Source Name</label>
+                <input
+                  value={form.sourceName}
+                  onChange={(e) => setForm((f) => ({ ...f, sourceName: e.target.value }))}
+                  placeholder="e.g. Nepal Rastra Bank"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 />
               </div>

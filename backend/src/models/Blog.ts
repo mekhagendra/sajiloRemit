@@ -5,6 +5,7 @@ export interface IBlog extends Document {
   thumbnail: string;
   shortDescription: string;
   sourceUrl: string;
+  sourceName: string;
   author: mongoose.Types.ObjectId;
   isPublished: boolean;
   createdAt: Date;
@@ -17,6 +18,7 @@ const blogSchema = new Schema<IBlog>(
     thumbnail: { type: String, default: '' },
     shortDescription: { type: String, default: '', trim: true, maxlength: 300 },
     sourceUrl: { type: String, required: true, trim: true },
+    sourceName: { type: String, default: '', trim: true },
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     isPublished: { type: Boolean, default: false },
   },

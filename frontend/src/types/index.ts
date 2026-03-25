@@ -89,6 +89,7 @@ export interface Blog {
   thumbnail: string;
   shortDescription: string;
   sourceUrl: string;
+  sourceName?: string;
   author: { name: string };
   isPublished: boolean;
   createdAt: string;
