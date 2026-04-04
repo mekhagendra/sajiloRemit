@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getForexRates } from '../api';
 import type { ForexRates } from '../types';
 import { RefreshCw } from 'lucide-react';
+import { formatCurrency } from '../utils/formatCurrency';
 
 const baseCurrencies = ['USD', 'AUD', 'GBP', 'EUR', 'CAD', 'JPY'];
 
@@ -77,7 +78,7 @@ export default function ForexPage() {
                     <span className="text-lg font-bold text-gray-900">{currency}</span>
                     <span className="text-xs text-gray-400">{forexData.base}/{currency}</span>
                   </div>
-                  <p className="text-2xl font-bold text-green-600">{rate.toFixed(4)}</p>
+                  <p className="text-2xl font-bold text-green-600">{formatCurrency(rate)}</p>
                 </div>
               ))}
           </div>

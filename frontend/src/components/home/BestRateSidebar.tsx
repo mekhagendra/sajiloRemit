@@ -4,6 +4,7 @@ import { getBestRates } from '../../api';
 import type { BestRate } from '../../types';
 import { TrendingUp } from 'lucide-react';
 import { COUNTRY_LIST } from '../../constants/countries';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 // currency code → country name lookup
 const currencyToName: Record<string, string> = {};
@@ -50,7 +51,7 @@ export default function BestRateSidebar() {
                 {currencyToFlag[rate.fromCurrency] && <span>{currencyToFlag[rate.fromCurrency]}</span>}
                 {currencyToName[rate.fromCurrency] ?? rate.fromCurrency}
               </span>
-              <span className="font-semibold text-green-600">{rate.rate.toFixed(2)}</span>
+              <span className="font-semibold text-green-600">{formatCurrency(rate.rate)}</span>
               <span className="hidden [@media(min-width:480px)]:block col-span-2 text-gray-600 truncate pl-2">{rate.remitter?.brandName || rate.remitter?.legalName || '—'}</span>
             </div>
           ))}

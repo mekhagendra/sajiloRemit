@@ -8,6 +8,7 @@ import {
 } from '../../api';
 import type { Country, ExchangeChartCell, SnapshotListItem } from '../../types';
 import { BarChart3, Camera, History, Save, X, TrendingUp, TrendingDown, Minus, Monitor, Filter } from 'lucide-react';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 interface ChartRemitter {
   _id: string;
@@ -277,7 +278,7 @@ export default function AdminExchangeChart() {
                       <div className="flex items-center gap-1 justify-center">
                         <input
                           type="number"
-                          step="0.01"
+                          step="0.000001"
                           className="w-20 px-1 py-0.5 text-sm border rounded text-center focus:outline-none focus:ring-1 focus:ring-green-400"
                           value={editValue}
                           onChange={(e) => setEditValue(e.target.value)}
@@ -303,7 +304,7 @@ export default function AdminExchangeChart() {
                       </div>
                     ) : cell ? (
                       <span className="font-semibold text-green-700">
-                        {cell.rate.toFixed(2)}
+                        {formatCurrency(cell.rate)}
                         {baseMatrix && renderTrend(cell.rate, baseCell?.rate)}
                       </span>
                     ) : (

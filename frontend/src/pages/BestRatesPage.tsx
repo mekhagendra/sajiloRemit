@@ -4,6 +4,7 @@ import { searchRates } from '../api';
 import type { RemittanceRate } from '../types';
 import { Search, Star, ExternalLink } from 'lucide-react';
 import { COUNTRY_LIST } from '../constants/countries';
+import { formatCurrency } from '../utils/formatCurrency';
 
 const sendCountries = COUNTRY_LIST.filter((c) => c.currency !== 'NPR');
 const nepal = COUNTRY_LIST.find((c) => c.currency === 'NPR')!;
@@ -195,13 +196,13 @@ export default function BestRatesPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-right text-sm font-medium text-gray-700">{getSendingAmount(rate).toFixed(2)}</td>
+                    <td className="px-4 py-4 text-right text-sm font-medium text-gray-700">{formatCurrency(getSendingAmount(rate))}</td>
                     <td className="px-4 py-4 text-right">
-                      <span className="text-base font-bold text-green-600">{rate.rate.toFixed(2)}</span>
+                      <span className="text-base font-bold text-green-600">{formatCurrency(rate.rate)}</span>
                     </td>
-                    <td className="px-4 py-4 text-right text-sm text-gray-500">{rate.fee.toFixed(2)}</td>
+                    <td className="px-4 py-4 text-right text-sm text-gray-500">{formatCurrency(rate.fee)}</td>
                     <td className="px-6 py-4 text-right">
-                      <span className="text-base font-semibold text-green-700">{getReceivable(rate).toFixed(2)}</span>
+                      <span className="text-base font-semibold text-green-700">{formatCurrency(getReceivable(rate))}</span>
                     </td>
                     <td className="px-2 py-4 text-center">
                       {rate.remitter.remittanceUrl && (
@@ -252,19 +253,19 @@ export default function BestRatesPage() {
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <p className="text-xs text-gray-400">Send ({fromCurrency})</p>
-                    <p className="font-medium text-gray-700">{getSendingAmount(rate).toFixed(2)}</p>
+                    <p className="font-medium text-gray-700">{formatCurrency(getSendingAmount(rate))}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-gray-400">Rate ({toCurrency})</p>
-                    <p className="font-bold text-green-600">{rate.rate.toFixed(2)}</p>
+                    <p className="font-bold text-green-600">{formatCurrency(rate.rate)}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-400">Fee</p>
-                    <p className="text-gray-700">{rate.fee.toFixed(2)}</p>
+                    <p className="text-gray-700">{formatCurrency(rate.fee)}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-gray-400">Receivable ({toCurrency})</p>
-                    <p className="font-semibold text-green-700">{getReceivable(rate).toFixed(2)}</p>
+                    <p className="font-semibold text-green-700">{formatCurrency(getReceivable(rate))}</p>
                   </div>
                 </div>
               </div>
