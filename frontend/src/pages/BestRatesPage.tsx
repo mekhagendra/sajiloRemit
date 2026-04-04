@@ -55,7 +55,8 @@ export default function BestRatesPage() {
   const getReceivable = (rate: RemittanceRate): number => {
     if (calcMode === 'send') {
       const amt = parseFloat(sendAmount) || 0;
-      return Math.max(0, amt * (rate.rate / rate.unit));
+      const afterFee = Math.max(0, amt - rate.fee);
+      return afterFee * (rate.rate / rate.unit);
     }
     return parseFloat(receiveAmount) || 0;
   };
@@ -63,7 +64,7 @@ export default function BestRatesPage() {
   const getSendingAmount = (rate: RemittanceRate): number => {
     if (calcMode === 'receive') {
       const recv = parseFloat(receiveAmount) || 0;
-      return recv * rate.unit / rate.rate;
+      return (recv * rate.unit / rate.rate) + rate.fee;
     }
     return parseFloat(sendAmount) || 0;
   };

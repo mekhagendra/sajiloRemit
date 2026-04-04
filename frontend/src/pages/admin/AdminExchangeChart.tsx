@@ -39,6 +39,7 @@ export default function AdminExchangeChart() {
   // Inline edit state
   const [editCell, setEditCell] = useState<{ remitterId: string; currency: string } | null>(null);
   const [editValue, setEditValue] = useState('');
+  const [editFeeValue, setEditFeeValue] = useState('');
   const [saving, setSaving] = useState(false);
 
   // Snapshot
@@ -128,12 +129,14 @@ export default function AdminExchangeChart() {
     const cell = matrix[remitterId]?.[currency];
     setEditCell({ remitterId, currency });
     setEditValue(cell ? String(cell.rate) : '');
+    setEditFeeValue(cell ? String(cell.fee) : '0');
   };
 
   const handleSave = async () => {
     if (!editCell) return;
     const rate = parseFloat(editValue);
     if (isNaN(rate) || rate <= 0) return;
+    const fee = parseFloat(editFeeValue) || 0;
 
     setSaving(true);
     try {
@@ -142,6 +145,7 @@ export default function AdminExchangeChart() {
         fromCurrency: editCell.currency,
         toCurrency: 'NPR',
         rate,
+        fee,
       });
       // Update live matrix and display matrix
       const patch = (prev: Matrix) => ({
@@ -275,38 +279,60 @@ export default function AdminExchangeChart() {
                     onClick={() => editable && !isEditing && handleCellClick(v._id, c.currency!)}
                   >
                     {isEditing ? (
-                      <div className="flex items-center gap-1 justify-center">
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="flex items-center gap-1 justify-center">
+                          <input
+                            type="number"
+                            step="0.000001"
+                            placeholder="Rate"
+                            className="w-20 px-1 py-0.5 text-sm border rounded text-center focus:outline-none focus:ring-1 focus:ring-green-400"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleSave();
+                              if (e.key === 'Escape') setEditCell(null);
+                            }}
+                            autoFocus
+                          />
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleSave(); }}
+                            disabled={saving}
+                            className="p-0.5 text-green-600 hover:text-green-800"
+                          >
+                            <Save className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setEditCell(null); }}
+                            className="p-0.5 text-gray-400 hover:text-gray-600"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                         <input
                           type="number"
                           step="0.000001"
-                          className="w-20 px-1 py-0.5 text-sm border rounded text-center focus:outline-none focus:ring-1 focus:ring-green-400"
-                          value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
+                          placeholder={`Charge (${c.currency})`}
+                          className="w-20 px-1 py-0.5 text-xs border border-orange-300 rounded text-center focus:outline-none focus:ring-1 focus:ring-orange-400"
+                          value={editFeeValue}
+                          onChange={(e) => setEditFeeValue(e.target.value)}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') handleSave();
                             if (e.key === 'Escape') setEditCell(null);
                           }}
-                          autoFocus
                         />
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleSave(); }}
-                          disabled={saving}
-                          className="p-0.5 text-green-600 hover:text-green-800"
-                        >
-                          <Save className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setEditCell(null); }}
-                          className="p-0.5 text-gray-400 hover:text-gray-600"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
                       </div>
                     ) : cell ? (
-                      <span className="font-semibold text-green-700">
-                        {formatCurrency(cell.rate)}
-                        {baseMatrix && renderTrend(cell.rate, baseCell?.rate)}
-                      </span>
+                      <div className="flex flex-col items-center">
+                        <span className="font-semibold text-green-700">
+                          {formatCurrency(cell.rate)}
+                          {baseMatrix && renderTrend(cell.rate, baseCell?.rate)}
+                        </span>
+                        {cell.fee > 0 && (
+                          <span className="text-[10px] text-orange-600 mt-0.5">
+                            fee: {formatCurrency(cell.fee)} {c.currency}
+                          </span>
+                        )}
+                      </div>
                     ) : (
                       <span className="text-gray-300">—</span>
                     )}
